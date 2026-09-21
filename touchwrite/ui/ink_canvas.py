@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import time
-
 from PySide6.QtCore import QPointF, Qt, Signal
 from PySide6.QtGui import QColor, QMouseEvent, QPainter, QPainterPath, QPen
 from PySide6.QtWidgets import QWidget
@@ -11,6 +9,7 @@ from PySide6.QtWidgets import QWidget
 from touchwrite.config.settings import Settings
 from touchwrite.ink.models import HandwrittenWord, Point, Stroke
 from touchwrite.ink.stroke_buffer import StrokeBuffer
+from touchwrite.input.mouse_provider import MouseInputProvider
 
 
 class InkCanvas(QWidget):
@@ -23,6 +22,7 @@ class InkCanvas(QWidget):
         super().__init__(parent)
         self.settings = settings
         self.buffer = StrokeBuffer(settings.min_stroke_points)
+        self.mouse_provider = MouseInputProvider()
         self.setMinimumHeight(260)
         self.setMouseTracking(True)
         self.setAttribute(Qt.WidgetAttribute.WA_NativeWindow, True)
@@ -59,7 +59,7 @@ class InkCanvas(QWidget):
             event.accept()
             return
         if event.button() == Qt.MouseButton.LeftButton:
-            self.buffer.begin(self._to_point(event.position()))
+            self.buffer.begin(self._to_point(event.position(), finger_down=True))
             self.update()
             event.accept()
             return
@@ -67,7 +67,7 @@ class InkCanvas(QWidget):
 
     def mouseMoveEvent(self, event: QMouseEvent) -> None:  # noqa: N802
         if self.buffer.active_stroke is not None and event.buttons() & Qt.MouseButton.LeftButton:
-            self.buffer.add(self._to_point(event.position()))
+            self.buffer.add(self._to_point(event.position(), finger_down=True))
             self.update()
             event.accept()
             return
@@ -75,7 +75,7 @@ class InkCanvas(QWidget):
 
     def mouseReleaseEvent(self, event: QMouseEvent) -> None:  # noqa: N802
         if event.button() == Qt.MouseButton.LeftButton and self.buffer.active_stroke is not None:
-            self.buffer.end(self._to_point(event.position()))
+            self.buffer.end(self._to_point(event.position(), finger_down=False))
             self.update()
             self.ink_changed.emit()
             event.accept()
@@ -113,14 +113,11 @@ class InkCanvas(QWidget):
                 path.lineTo(position)
             painter.drawPath(path)
 
-    def _to_point(self, position: QPointF) -> Point:
-        width = max(1, self.width())
-        height = max(1, self.height())
-        return Point(
-            x=min(1.0, max(0.0, position.x() / width)),
-            y=min(1.0, max(0.0, position.y() / height)),
-            x_raw=position.x(),
-            y_raw=position.y(),
-            timestamp_ns=time.monotonic_ns(),
-            contact_id=0,
+    def _to_point(self, position: QPointF, *, finger_down: bool) -> Point:
+        return self.mouse_provider.point(
+            position.x(),
+            position.y(),
+            self.width(),
+            self.height(),
+            finger_down=finger_down,
         )

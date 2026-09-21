@@ -46,6 +46,7 @@ class MainWindow(QMainWindow):
         self.service = service
         self._recognition_pending = False
         self._history: list[_CommitAction] = []
+        self._cleared_words: list[HandwrittenWord] = []
         self._pending_action: _CommitAction | None = None
         self._touchpad_provider: PrecisionTouchpadInputProvider | None = None
         self._last_outcome: CommitOutcome | None = None
@@ -61,7 +62,7 @@ class MainWindow(QMainWindow):
         self.mode_label = QLabel(f"Input mode: {settings.input_mode}")
 
         clear_button = QPushButton("Clear ink")
-        clear_button.clicked.connect(self.canvas.clear_ink)
+        clear_button.clicked.connect(self._clear_ink)
         undo_button = QPushButton("Undo stroke")
         undo_button.clicked.connect(self._undo)
         commit_button = QPushButton("Recognize + Space")
@@ -114,7 +115,7 @@ class MainWindow(QMainWindow):
             self._undo()
             event.accept()
         elif key == Qt.Key.Key_Escape:
-            self.canvas.clear_ink()
+            self._clear_ink()
             event.accept()
         elif key == Qt.Key.Key_Backspace:
             self._backspace()
@@ -203,6 +204,10 @@ class MainWindow(QMainWindow):
         if not self.canvas.buffer.is_empty:
             self.canvas.undo_stroke()
             return
+        if self._cleared_words:
+            self.canvas.restore(self._cleared_words.pop())
+            self.statusBar().showMessage("Cleared ink restored")
+            return
         if self._history:
             action = self._history.pop()
             self.editor.setPlainText(action.text_before)
@@ -210,6 +215,11 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage("Committed word restored to canvas")
             return
         self.editor.undo()
+
+    def _clear_ink(self) -> None:
+        if not self.canvas.buffer.is_empty:
+            self._cleared_words.append(self.canvas.snapshot())
+        self.canvas.clear_ink()
 
     def _toggle_writing_mode(self) -> None:
         if self._touchpad_provider is None:

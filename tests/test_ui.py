@@ -59,3 +59,14 @@ def test_recognition_failure_preserves_ink(qtbot) -> None:
     qtbot.waitUntil(lambda: not window._recognition_pending, timeout=3000)
     assert len(window.canvas.strokes) == 1
     assert "ink preserved" in window.statusBar().currentMessage()
+
+
+def test_clear_then_undo_restores_word(qtbot) -> None:
+    service = HandwritingService(UiRecognizer(), InkRenderer(), None)
+    window = MainWindow(Settings(save_samples=False), service)
+    qtbot.addWidget(window)
+    add_stroke(window)
+    window._clear_ink()
+    assert window.canvas.buffer.is_empty
+    window._undo()
+    assert len(window.canvas.strokes) == 1
