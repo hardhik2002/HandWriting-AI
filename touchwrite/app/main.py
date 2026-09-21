@@ -27,14 +27,20 @@ def main() -> int:
         settings.render_padding,
         settings.stroke_width,
     )
+    debug_dir = settings.debug_recognition_dir if settings.debug_recognition else None
     recognizer = ImageHandwritingRecognizer(
-        settings.model_name, settings.model_device, settings.beam_width
+        settings.model_name,
+        settings.model_device,
+        settings.beam_width,
+        settings.max_new_tokens,
+        settings.processor_use_fast,
+        debug_dir,
     )
     store = SessionStore(settings.data_dir) if settings.save_samples else None
     smoother = (
         MovingAverageSmoother(settings.smoothing_window) if settings.smoothing_enabled else None
     )
-    service = HandwritingService(recognizer, renderer, store, smoother)
+    service = HandwritingService(recognizer, renderer, store, smoother, debug_dir=debug_dir)
     window = MainWindow(settings, service)
     window.show()
     return app.exec()

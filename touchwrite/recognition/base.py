@@ -31,6 +31,13 @@ class RecognitionResult:
     confidence: float | None = None
     alternatives: tuple[RecognitionCandidate, ...] = field(default_factory=tuple)
     raw_text: str | None = None
+    model_load_duration_ms: float | None = None
+    processing_duration_ms: float | None = None
+    generation_duration_ms: float | None = None
+    decoding_duration_ms: float | None = None
+    device: str | None = None
+    processor_mode: str | None = None
+    generation_settings: dict[str, object] = field(default_factory=dict)
 
 
 class RecognitionError(RuntimeError):
@@ -41,4 +48,3 @@ class HandwritingRecognizer(ABC):
     @abstractmethod
     def recognize(self, sample: RecognitionSample) -> RecognitionResult:
         """Recognize a single word image without mutating application state."""
-

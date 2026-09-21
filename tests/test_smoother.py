@@ -15,3 +15,15 @@ def test_smoothing_reduces_synthetic_jitter_and_preserves_ends() -> None:
     assert smoothed.points[-1] == original.points[-1]
     assert abs(smoothed.points[1].y - 0.5) < abs(original.points[1].y - 0.5)
 
+
+def test_smoothing_updates_raw_render_coordinates() -> None:
+    original = Stroke(
+        1,
+        [
+            point(0.0, 0.0, 1),
+            point(0.5, 1.0, 2),
+            point(1.0, 0.0, 3),
+        ],
+    )
+    smoothed = MovingAverageSmoother(3).smooth(original)
+    assert smoothed.points[1].y_raw == 1 / 3

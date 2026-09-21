@@ -28,7 +28,8 @@ class MovingAverageSmoother:
                     point,
                     x=sum(sample.x for sample in samples) / len(samples),
                     y=sum(sample.y for sample in samples) / len(samples),
+                    x_raw=sum(sample.x_raw for sample in samples) / len(samples),
+                    y_raw=sum(sample.y_raw for sample in samples) / len(samples),
                 )
             )
         return Stroke(stroke.stroke_id, output)
-

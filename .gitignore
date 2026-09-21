@@ -11,8 +11,9 @@ models/*
 !models/.gitkeep
 data/handwriting/*
 !data/handwriting/.gitkeep
+data/debug/
 reports/*
 !reports/.gitkeep
+!reports/*.md
 logs/
 config.local.json
-

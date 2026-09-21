@@ -48,3 +48,19 @@ def test_failure_does_not_mutate_prediction() -> None:
     with pytest.raises(RecognitionError, match="test failure"):
         service.commit(word, " ")
     assert word.predicted_text is None
+
+
+def test_debug_mode_saves_pre_model_artifacts(tmp_path) -> None:
+    debug_dir = tmp_path / "debug"
+    word = HandwrittenWord([stroke()])
+    service = HandwritingService(
+        FakeRecognizer(), InkRenderer(), None, debug_dir=debug_dir
+    )
+    service.commit(word, " ")
+    sample_dir = debug_dir / word.word_id
+    assert {path.name for path in sample_dir.iterdir()} == {
+        "raw_strokes.png",
+        "rendered.png",
+        "processed.png",
+        "preprocessing.json",
+    }
