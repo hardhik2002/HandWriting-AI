@@ -230,11 +230,18 @@ class MainWindow(QMainWindow):
             self.settings.two_finger_max_travel,
             self.settings.two_finger_overlap_min_ms,
         )
+        application = QCoreApplication.instance()
+        if application is None:
+            self.statusBar().showMessage("Qt application is not initialized")
+            return
+        provider: PrecisionTouchpadInputProvider | None = None
         try:
             provider = PrecisionTouchpadInputProvider(engine, self._native_gesture)
-            QCoreApplication.instance().installNativeEventFilter(provider)
+            application.installNativeEventFilter(provider)
             provider.start(int(self.canvas.winId()))
         except OSError as error:
+            if provider is not None:
+                application.removeNativeEventFilter(provider)
             self.statusBar().showMessage(f"Could not start native touchpad input: {error}")
             return
         self._touchpad_provider = provider
@@ -248,7 +255,9 @@ class MainWindow(QMainWindow):
         provider, self._touchpad_provider = self._touchpad_provider, None
         if provider is not None:
             provider.stop()
-            QCoreApplication.instance().removeNativeEventFilter(provider)
+            application = QCoreApplication.instance()
+            if application is not None:
+                application.removeNativeEventFilter(provider)
         self.mode_label.setText("Input mode: mouse")
         self.mode_button.setText("Start Writing Mode")
         self.statusBar().showMessage("Mouse fallback mode")

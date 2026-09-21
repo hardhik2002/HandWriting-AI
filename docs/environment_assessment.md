@@ -24,18 +24,20 @@ official Win32 pointer messages only inside the TouchWrite window and is kept be
 provider interface. It will never install or replace a driver, globally hook input, or disable the
 touchpad.
 
-The proposed `RegisterTouchpadCapableWindow` / `GetPointerTouchpadInfo` symbols could not be
-verified in an installed SDK because no SDK headers are present. Native implementation must be
-checked against a locally installed Windows SDK before it is declared operational. A small C++
-bridge is preferred if Qt's native event boundary cannot reliably expose the required contact
-information.
+The installed User32 library exports `RegisterTouchpadCapableWindow`, `GetPointerTouchpadInfo`, and
+`GetPointerFrameTouchpadInfo` at their Microsoft-documented ordinals (2689, 2691, and 2693). The
+public documentation and ABI were verified online because no local SDK headers are installed. The
+application uses a small `ctypes` boundary, so a compiler is not required for the current provider.
 
 ## Limitations and validation status
 
-- **Implemented:** environment detection, mouse-based live ink foundation.
+- **Implemented:** environment detection, mouse-based live ink, Win32 window registration, touchpad
+  frame ABI decoding, and normalized contact events.
+- **Runtime verified:** the real Qt canvas HWND registered and unregistered successfully through
+  `RegisterTouchpadCapableWindow` on this Windows build.
 - **Hardware validation required:** independent one-finger touchpad contact coordinates,
   suppression of scroll gestures while writing mode is active, and two-finger tap delivery.
-- Native compilation is blocked on this machine until Visual Studio 2022 Build Tools with the
+- A future native compilation path remains blocked until Visual Studio 2022 Build Tools with the
   Desktop development with C++ workload and a Windows 11 SDK are installed.
 - No drivers were changed and no administrator-only capture mechanism was introduced.
 
