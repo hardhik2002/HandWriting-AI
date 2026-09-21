@@ -19,6 +19,7 @@ original online trajectory and rendered images for future personalization.
 - Mouse fallback is always retained because Windows normally converts one-finger touchpad motion to
   mouse input before desktop applications see it.
 - Evaluation and dataset-export commands with measured CER, WER, word accuracy, and latency.
+- Recognition diagnostics that save the exact image tensor seen by TrOCR.
 
 The native touchpad path is implemented but still requires interactive hardware validation. See
 [`docs/touchpad_input.md`](docs/touchpad_input.md) for the exact Windows API limitation.
@@ -69,6 +70,9 @@ python -c "from transformers import TrOCRProcessor, VisionEncoderDecoderModel; n
 After it is cached, recognition performs no required network call. Configure another compatible
 model with `TOUCHWRITE_MODEL_NAME`; no recognizer code changes are needed.
 
+Processor behavior is intentionally fixed to the checkpoint-compatible slow processor. Generation
+uses deterministic beam search; random sampling is disabled.
+
 ## Run
 
 ```powershell
@@ -105,6 +109,7 @@ $env:TOUCHWRITE_MODEL_DEVICE = "cpu"
 $env:TOUCHWRITE_SMOOTHING_ENABLED = "true"
 $env:TOUCHWRITE_SAVE_SAMPLES = "true"
 $env:TOUCHWRITE_DEBUG_INPUT = "false"
+$env:TOUCHWRITE_DEBUG_RECOGNITION = "false"
 python -m touchwrite.app.main
 ```
 
@@ -119,6 +124,16 @@ pytest
 ruff check .
 python -m compileall -q touchwrite
 ```
+
+Run recognition directly against an image without the GUI:
+
+```powershell
+python -m touchwrite.tools.test_recognition data\handwriting\<sample-id>\processed.png
+```
+
+Enable `TOUCHWRITE_DEBUG_RECOGNITION=true` to save `raw_strokes.png`, `rendered.png`,
+`processed.png`, and the exact human-viewable `model_input.png` under
+`data/debug/recognition/<word-id>/`.
 
 ## Dataset and corrections
 
@@ -175,3 +190,4 @@ normal reason for network access.
 - [`docs/touchpad_input.md`](docs/touchpad_input.md)
 - [`docs/recognition_pipeline.md`](docs/recognition_pipeline.md)
 - [`docs/personalization.md`](docs/personalization.md)
+- [`reports/recognition_diagnosis.md`](reports/recognition_diagnosis.md)

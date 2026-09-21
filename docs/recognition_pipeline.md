@@ -16,11 +16,14 @@ replacement boundary.
 
 1. Preserve the original `HandwrittenWord` trajectory.
 2. Optionally smooth each stroke with a three-sample moving average while preserving endpoints.
-3. Calculate the normalized ink bounding box.
-4. Fit it into a 512×192 image with controlled padding and preserved aspect ratio.
+3. Calculate the ink bounding box in retained raw window coordinates. Independently normalized X/Y
+   units are not used for raster geometry because the canvas is not square.
+4. Fit it into a measured 512×128 image with controlled padding and preserved physical aspect ratio.
 5. Supersample 3×, draw rounded strokes, and downsample with Lanczos.
 6. Convert the model image to RGB through the model processor.
-7. Use beam generation and retain unique alternatives.
+7. Use deterministic eight-beam generation and retain unique alternatives.
+8. Prefer the first model-produced candidate matching the explicit single-word boundary; never
+   rewrite candidate characters or consult a name dictionary.
 
 Both unsmoothed `raw.png` and smoothed/model-ready `processed.png` are stored.
 
@@ -32,6 +35,10 @@ PyTorch reports it available; an unavailable requested CUDA device falls back to
 
 TrOCR generation scores are not calibrated confidence probabilities, so V1 reports confidence as
 unavailable instead of fabricating a value.
+
+Set `TOUCHWRITE_DEBUG_RECOGNITION=true` to persist each preprocessing stage plus a denormalized
+384×384 RGB view reconstructed from the exact tensor passed to the encoder. See the measured
+diagnosis in [`../reports/recognition_diagnosis.md`](../reports/recognition_diagnosis.md).
 
 ## Measured smoke result
 
@@ -52,4 +59,3 @@ benchmark and not representative of touchpad handwriting.
 
 Do not compare models on training samples used for personalization. Create user-stratified train,
 validation, and held-out test splits once enough labels exist.
-
