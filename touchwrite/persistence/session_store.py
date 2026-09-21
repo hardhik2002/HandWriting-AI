@@ -27,6 +27,7 @@ class SessionStore:
         if sample_dir.exists():
             raise FileExistsError(f"sample already exists: {word.word_id}")
         sample_dir.mkdir(parents=True)
+        word.rendered_image_path = str(sample_dir / "processed.png")
         self._write_json_atomic(sample_dir / "trajectory.json", word.to_dict())
         metadata = {
             "word_id": word.word_id,
@@ -72,4 +73,3 @@ class SessionStore:
             temporary.replace(path)
         finally:
             temporary.unlink(missing_ok=True)
-

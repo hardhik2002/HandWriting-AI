@@ -15,7 +15,7 @@ def test_save_load_and_correction(tmp_path) -> None:
     assert (sample_dir / "trajectory.json").exists()
     loaded = store.load(word.word_id)
     assert loaded.predicted_text == "helo"
+    assert loaded.rendered_image_path == str(sample_dir / "processed.png")
     assert len(loaded.strokes[0].points) == 2
     store.update_correction(word.word_id, "hello")
     assert store.load(word.word_id).expected_text == "hello"
-

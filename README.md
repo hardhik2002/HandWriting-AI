@@ -90,7 +90,7 @@ into native Windows 11 touchpad pointer messages.
 | Enter | Commit word and insert newline |
 | Backspace | Remove last active stroke, otherwise delete text |
 | Escape | Clear current uncommitted ink |
-| Ctrl+Z | Undo stroke or restore the last committed word to the canvas |
+| Ctrl+Z | Undo a stroke/clear or restore the last committed word to the canvas |
 
 Keyboard handling is scoped to the TouchWrite window. When the editable text area has focus, it
 receives normal editing keys.
