@@ -1,0 +1,48 @@
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "touchwrite"
+version = "0.1.0"
+description = "Local Windows touchpad handwriting input and recognition"
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+license = { text = "MIT" }
+authors = [{ name = "TouchWrite contributors" }]
+dependencies = [
+  "numpy>=1.26,<3",
+  "opencv-python>=4.9,<5",
+  "Pillow>=10,<13",
+  "PySide6>=6.7,<7",
+]
+
+[project.optional-dependencies]
+ml = [
+  "torch>=2.2,<3",
+  "transformers>=4.45,<5",
+  "safetensors>=0.4,<1",
+]
+dev = [
+  "pytest>=8,<9",
+  "pytest-qt>=4.4,<5",
+  "ruff>=0.9,<1",
+]
+
+[project.scripts]
+touchwrite = "touchwrite.app.main:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["touchwrite"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
