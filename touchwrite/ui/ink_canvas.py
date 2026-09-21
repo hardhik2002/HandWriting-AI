@@ -9,6 +9,8 @@ from PySide6.QtGui import QColor, QMouseEvent, QPainter, QPainterPath, QPen
 from PySide6.QtWidgets import QWidget
 
 from touchwrite.config.settings import Settings
+from touchwrite.ink.models import HandwrittenWord, Point, Stroke
+from touchwrite.ink.stroke_buffer import StrokeBuffer
 
 
 class InkCanvas(QWidget):
@@ -19,8 +21,7 @@ class InkCanvas(QWidget):
     def __init__(self, settings: Settings, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self.settings = settings
-        self._strokes: list[list[tuple[QPointF, int]]] = []
-        self._active: list[tuple[QPointF, int]] | None = None
+        self.buffer = StrokeBuffer(settings.min_stroke_points)
         self.setMinimumHeight(260)
         self.setMouseTracking(True)
         self.setAutoFillBackground(True)
@@ -29,44 +30,46 @@ class InkCanvas(QWidget):
         self.setPalette(palette)
 
     @property
-    def strokes(self) -> tuple[tuple[tuple[QPointF, int], ...], ...]:
-        return tuple(tuple(stroke) for stroke in self._strokes)
+    def strokes(self) -> tuple[Stroke, ...]:
+        return self.buffer.strokes
+
+    def snapshot(self) -> HandwrittenWord:
+        return self.buffer.snapshot()
+
+    def restore(self, word: HandwrittenWord) -> None:
+        self.buffer.restore(word)
+        self.update()
+        self.ink_changed.emit()
 
     def clear_ink(self) -> None:
-        self._strokes.clear()
-        self._active = None
+        self.buffer.clear()
         self.update()
         self.ink_changed.emit()
 
     def undo_stroke(self) -> None:
-        if self._active is not None:
-            self._active = None
-        elif self._strokes:
-            self._strokes.pop()
+        self.buffer.undo()
         self.update()
         self.ink_changed.emit()
 
     def mousePressEvent(self, event: QMouseEvent) -> None:  # noqa: N802
         if event.button() == Qt.MouseButton.LeftButton:
-            self._active = [(event.position(), time.monotonic_ns())]
+            self.buffer.begin(self._to_point(event.position()))
             self.update()
             event.accept()
             return
         super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event: QMouseEvent) -> None:  # noqa: N802
-        if self._active is not None and event.buttons() & Qt.MouseButton.LeftButton:
-            self._active.append((event.position(), time.monotonic_ns()))
+        if self.buffer.active_stroke is not None and event.buttons() & Qt.MouseButton.LeftButton:
+            self.buffer.add(self._to_point(event.position()))
             self.update()
             event.accept()
             return
         super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event: QMouseEvent) -> None:  # noqa: N802
-        if event.button() == Qt.MouseButton.LeftButton and self._active is not None:
-            self._active.append((event.position(), time.monotonic_ns()))
-            self._strokes.append(self._active)
-            self._active = None
+        if event.button() == Qt.MouseButton.LeftButton and self.buffer.active_stroke is not None:
+            self.buffer.end(self._to_point(event.position()))
             self.update()
             self.ink_changed.emit()
             event.accept()
@@ -86,14 +89,32 @@ class InkCanvas(QWidget):
                 Qt.PenJoinStyle.RoundJoin,
             )
         )
-        for stroke in [*self._strokes, *([self._active] if self._active else [])]:
-            if not stroke:
+        strokes = list(self.buffer.strokes)
+        if self.buffer.active_stroke is not None:
+            strokes.append(self.buffer.active_stroke)
+        for stroke in strokes:
+            if not stroke.points:
                 continue
-            if len(stroke) == 1:
-                painter.drawPoint(stroke[0][0])
+            positions = [
+                QPointF(point.x * self.width(), point.y * self.height())
+                for point in stroke.points
+            ]
+            if len(positions) == 1:
+                painter.drawPoint(positions[0])
                 continue
-            path = QPainterPath(stroke[0][0])
-            for point, _timestamp in stroke[1:]:
-                path.lineTo(point)
+            path = QPainterPath(positions[0])
+            for position in positions[1:]:
+                path.lineTo(position)
             painter.drawPath(path)
 
+    def _to_point(self, position: QPointF) -> Point:
+        width = max(1, self.width())
+        height = max(1, self.height())
+        return Point(
+            x=min(1.0, max(0.0, position.x() / width)),
+            y=min(1.0, max(0.0, position.y() / height)),
+            x_raw=position.x(),
+            y_raw=position.y(),
+            timestamp_ns=time.monotonic_ns(),
+            contact_id=0,
+        )
