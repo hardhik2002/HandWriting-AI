@@ -17,6 +17,7 @@ class InkCanvas(QWidget):
     """Capture and render mouse strokes without blocking the UI thread."""
 
     ink_changed = Signal()
+    space_requested = Signal()
 
     def __init__(self, settings: Settings, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -24,6 +25,7 @@ class InkCanvas(QWidget):
         self.buffer = StrokeBuffer(settings.min_stroke_points)
         self.setMinimumHeight(260)
         self.setMouseTracking(True)
+        self.setAttribute(Qt.WidgetAttribute.WA_NativeWindow, True)
         self.setAutoFillBackground(True)
         palette = self.palette()
         palette.setColor(self.backgroundRole(), QColor("white"))
@@ -52,6 +54,10 @@ class InkCanvas(QWidget):
         self.ink_changed.emit()
 
     def mousePressEvent(self, event: QMouseEvent) -> None:  # noqa: N802
+        if event.button() == Qt.MouseButton.RightButton:
+            self.space_requested.emit()
+            event.accept()
+            return
         if event.button() == Qt.MouseButton.LeftButton:
             self.buffer.begin(self._to_point(event.position()))
             self.update()

@@ -4,10 +4,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import QCoreApplication, Qt
 from PySide6.QtGui import QKeyEvent, QTextCursor
 from PySide6.QtWidgets import (
     QHBoxLayout,
+    QInputDialog,
     QLabel,
     QMainWindow,
     QPushButton,
@@ -19,6 +20,12 @@ from PySide6.QtWidgets import (
 
 from touchwrite.config.settings import Settings
 from touchwrite.ink.models import HandwrittenWord
+from touchwrite.input.base import GestureAction
+from touchwrite.input.gesture_engine import GestureEngine
+from touchwrite.input.precision_touchpad_provider import (
+    PrecisionTouchpadInputProvider,
+    TouchpadApi,
+)
 from touchwrite.services.handwriting_service import CommitOutcome, HandwritingService
 from touchwrite.ui.ink_canvas import InkCanvas
 from touchwrite.ui.recognition_worker import RecognitionWorker
@@ -40,10 +47,13 @@ class MainWindow(QMainWindow):
         self._recognition_pending = False
         self._history: list[_CommitAction] = []
         self._pending_action: _CommitAction | None = None
+        self._touchpad_provider: PrecisionTouchpadInputProvider | None = None
+        self._last_outcome: CommitOutcome | None = None
         self.setWindowTitle("TouchWrite")
         self.resize(1000, 720)
 
         self.canvas = InkCanvas(settings)
+        self.canvas.space_requested.connect(lambda: self._request_commit(" "))
         self.editor = QTextEdit()
         self.editor.setPlaceholderText("Recognized text appears here and remains editable.")
         self.prediction_label = QLabel("Prediction: —")
@@ -56,11 +66,17 @@ class MainWindow(QMainWindow):
         undo_button.clicked.connect(self._undo)
         commit_button = QPushButton("Recognize + Space")
         commit_button.clicked.connect(lambda: self._request_commit(" "))
+        self.mode_button = QPushButton("Start Writing Mode")
+        self.mode_button.clicked.connect(self._toggle_writing_mode)
+        correction_button = QPushButton("Correct last prediction")
+        correction_button.clicked.connect(self._correct_last_prediction)
 
         controls = QHBoxLayout()
         controls.addWidget(clear_button)
         controls.addWidget(undo_button)
         controls.addWidget(commit_button)
+        controls.addWidget(self.mode_button)
+        controls.addWidget(correction_button)
         controls.addStretch()
         controls.addWidget(self.mode_label)
 
@@ -85,6 +101,8 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage("Ready — mouse fallback mode")
         self.canvas.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.canvas.setFocus()
+        if settings.input_mode == "touchpad":
+            self._start_writing_mode()
 
     def keyPressEvent(self, event: QKeyEvent) -> None:  # noqa: N802
         if self.editor.hasFocus():
@@ -150,6 +168,7 @@ class MainWindow(QMainWindow):
         if self._pending_action is not None:
             self._history.append(self._pending_action)
         self._pending_action = None
+        self._last_outcome = outcome
         self.canvas.clear_ink()
         self._recognition_pending = False
         self.canvas.setEnabled(True)
@@ -191,3 +210,69 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage("Committed word restored to canvas")
             return
         self.editor.undo()
+
+    def _toggle_writing_mode(self) -> None:
+        if self._touchpad_provider is None:
+            self._start_writing_mode()
+        else:
+            self._stop_writing_mode()
+
+    def _start_writing_mode(self) -> None:
+        if self._touchpad_provider is not None:
+            return
+        if not TouchpadApi.is_available():
+            self.statusBar().showMessage(
+                "Native touchpad APIs unavailable; mouse fallback remains active"
+            )
+            return
+        engine = GestureEngine(
+            self.settings.two_finger_tap_max_ms,
+            self.settings.two_finger_max_travel,
+            self.settings.two_finger_overlap_min_ms,
+        )
+        try:
+            provider = PrecisionTouchpadInputProvider(engine, self._native_gesture)
+            QCoreApplication.instance().installNativeEventFilter(provider)
+            provider.start(int(self.canvas.winId()))
+        except OSError as error:
+            self.statusBar().showMessage(f"Could not start native touchpad input: {error}")
+            return
+        self._touchpad_provider = provider
+        self.mode_label.setText("Input mode: touchpad-assisted")
+        self.mode_button.setText("Stop Writing Mode")
+        self.statusBar().showMessage(
+            "Writing mode active — left contact/mouse writes; two-finger/right-click commits"
+        )
+
+    def _stop_writing_mode(self) -> None:
+        provider, self._touchpad_provider = self._touchpad_provider, None
+        if provider is not None:
+            provider.stop()
+            QCoreApplication.instance().removeNativeEventFilter(provider)
+        self.mode_label.setText("Input mode: mouse")
+        self.mode_button.setText("Start Writing Mode")
+        self.statusBar().showMessage("Mouse fallback mode")
+
+    def _native_gesture(self, action: GestureAction) -> None:
+        if action is GestureAction.SPACE:
+            self._request_commit(" ")
+
+    def closeEvent(self, event: object) -> None:  # noqa: N802
+        self._stop_writing_mode()
+        super().closeEvent(event)
+
+    def _correct_last_prediction(self) -> None:
+        outcome = self._last_outcome
+        if outcome is None or outcome.sample_id is None or self.service.store is None:
+            self.statusBar().showMessage("No persisted prediction is available to correct")
+            return
+        corrected, accepted = QInputDialog.getText(
+            self,
+            "Correct prediction",
+            "Expected text:",
+            text=outcome.word.predicted_text or "",
+        )
+        corrected = corrected.strip()
+        if accepted and corrected:
+            self.service.store.update_correction(outcome.sample_id, corrected)
+            self.statusBar().showMessage(f"Saved correction for sample {outcome.sample_id}")
