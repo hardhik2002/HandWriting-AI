@@ -70,6 +70,7 @@ class MainWindow(QMainWindow):
         self._next_commit_sequence = self._initial_sequence()
         self._pending_commits: dict[int, _PendingCommit] = {}
         self._commit_snapshots: dict[int, HandwrittenWord] = {}
+        self._completed_events: dict[int, RecognitionEvent] = {}
         self._cleared_words: list[HandwrittenWord] = []
         self._recognition_pending = False
         self._preview_scheduled_at = 0.0
@@ -171,6 +172,7 @@ class MainWindow(QMainWindow):
             ("Clear Current Ink", self._clear_ink),
             ("New Document", self._new_document),
             ("Save", self._save_document),
+            ("Edit Text", self._edit_text),
             ("Export", self._export_text),
             ("Settings", self._show_settings),
             ("Diagnostics", self._show_diagnostics),
@@ -284,6 +286,7 @@ class MainWindow(QMainWindow):
         if sequence is None:
             return
         self._pending_commits.pop(sequence, None)
+        self._completed_events[sequence] = value
         outcome = value.outcome
         metadata = {
             "trajectory_hash": value.request.fingerprint,
@@ -356,7 +359,24 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage("Undid last whiteboard action")
 
     def _redo(self) -> None:
-        if self.document.redo() is not None:
+        label = self.document.redo()
+        if label is not None:
+            if label.startswith("commit:"):
+                sequence = int(label.partition(":")[2])
+                event = self._completed_events.get(sequence)
+                if event is not None:
+                    outcome = event.outcome
+                    self.document.resolve_word(
+                        sequence,
+                        outcome.inserted_text,
+                        outcome.sample_id,
+                        {
+                            "trajectory_hash": event.request.fingerprint,
+                            "inference_duration_ms": outcome.result.inference_duration_ms,
+                            "cache_reused": event.cache_reused,
+                            "model_name": outcome.result.model_name,
+                        },
+                    )
             self.canvas.clear_ink()
             self._document_changed()
             self.statusBar().showMessage("Redid whiteboard action")
@@ -391,6 +411,18 @@ class MainWindow(QMainWindow):
         Path(filename).write_text(self.document.to_plain_text(), encoding="utf-8")
         self.statusBar().showMessage(f"Exported {filename}")
 
+    def _edit_text(self) -> None:
+        text, accepted = QInputDialog.getMultiLineText(
+            self,
+            "Edit document text",
+            "Plain text:",
+            self.document.to_plain_text(),
+        )
+        if accepted:
+            self.document.replace_plain_text(text)
+            self._document_changed()
+            self.statusBar().showMessage("Document text updated")
+
     def _show_settings(self) -> None:
         QMessageBox.information(
             self,
@@ -423,7 +455,8 @@ class MainWindow(QMainWindow):
         self.scroll_area.ensureVisible(int(x), int(y), 80, 100)
 
     def _initial_sequence(self) -> int:
-        return (
+        return max(
+            0,
             max(
                 (
                     word.commit_sequence_id
@@ -431,9 +464,8 @@ class MainWindow(QMainWindow):
                     for word in line.words
                 ),
                 default=0,
-            )
-            + 1
-        )
+            ),
+        ) + 1
 
     def _update_model_label(self, outcome: CommitOutcome) -> None:
         self.confidence_label.setText(

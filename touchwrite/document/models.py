@@ -159,6 +159,26 @@ class WhiteboardDocument:
         self.lines = [DocumentLine()]
         self.current_line_index = 0
 
+    def replace_plain_text(self, text: str) -> None:
+        """Replace document text from the editable representation without touching samples."""
+        self._remember("edit-text")
+        sequence = -1
+        lines: list[DocumentLine] = []
+        for source_line in text.split("\n"):
+            words: list[DocumentWord] = []
+            for value in source_line.strip().split():
+                words.append(
+                    DocumentWord(
+                        commit_sequence_id=sequence,
+                        text=value,
+                        recognition_metadata={"edited": True},
+                    )
+                )
+                sequence -= 1
+            lines.append(DocumentLine(words, source_line.endswith(" ") and bool(words)))
+        self.lines = lines or [DocumentLine()]
+        self.current_line_index = len(self.lines) - 1
+
     def new_document(self) -> None:
         self._remember("new-document")
         self.document_id = str(uuid4())

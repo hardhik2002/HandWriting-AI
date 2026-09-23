@@ -63,3 +63,12 @@ def test_autosave_restore_round_trip(tmp_path) -> None:
     assert restored.document_id == "saved-document"
     assert restored.current_line_index == 1
     assert restored.to_plain_text() == "saved\n"
+
+
+def test_editable_plain_text_representation_is_undoable() -> None:
+    document = WhiteboardDocument()
+    document.replace_plain_text("I am Hardhik\nI am an AI Engineer")
+    assert document.to_plain_text() == "I am Hardhik\nI am an AI Engineer"
+    assert document.current_line_index == 1
+    assert document.undo() == "edit-text"
+    assert document.to_plain_text() == ""

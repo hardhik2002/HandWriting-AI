@@ -1,0 +1,20 @@
+{
+  "pipeline": {
+    "model_name": "microsoft/trocr-base-handwritten",
+    "processor_use_fast": false,
+    "beam_width": 8,
+    "max_new_tokens": 24,
+    "render_width": 512,
+    "render_height": 128,
+    "render_padding": 16,
+    "stroke_width": 8,
+    "smoothing_window": 3
+  },
+  "samples": [
+    {
+      "word_id": "ba216970-66de-4d3e-b192-7669dd273b86",
+      "expected": "hardhik",
+      "before_prediction": "hardhik"
+    }
+  ]
+}

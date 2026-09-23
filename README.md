@@ -79,9 +79,10 @@ uses deterministic beam search; random sampling is disabled.
 python -m touchwrite.app.main
 ```
 
-On first run, draw in the white canvas using left mouse drag. Press **Space** or select
-**Recognize + Space** to recognize the current word. Press **Start Writing Mode** to opt the window
-into native Windows 11 touchpad pointer messages.
+TouchWrite opens as a large, scrollable document whiteboard. Write on the active line using the
+touchpad or mouse. A temporary prediction appears after the configurable 500 ms idle debounce;
+only Space/two-finger tap or Enter commits text. Recognition runs on one background worker, so the
+next word can be written while an earlier commit is still resolving.
 
 ## Controls
 
@@ -91,13 +92,13 @@ into native Windows 11 touchpad pointer messages.
 | Two-finger tap where Windows maps it to right-click | Commit word and insert one space |
 | Right-click in canvas | Explicit fallback for commit + space |
 | Spacebar in mouse mode | Commit word and insert one space |
-| Enter | Commit word and insert newline |
+| Enter | Commit the current word (if any), create a new line, and keep it visible |
 | Backspace | Remove last active stroke, otherwise delete text |
 | Escape | Clear current uncommitted ink |
-| Ctrl+Z | Undo a stroke/clear or restore the last committed word to the canvas |
+| Ctrl+Z / Ctrl+Y | Undo / redo strokes and logical document actions |
 
-Keyboard handling is scoped to the TouchWrite window. When the editable text area has focus, it
-receives normal editing keys.
+Keyboard handling is scoped to the TouchWrite window. Use **Edit Text** for a multiline plain-text
+editor backed by the same structured document state.
 
 ## Configuration
 
@@ -108,12 +109,19 @@ $env:TOUCHWRITE_INPUT_MODE = "mouse"
 $env:TOUCHWRITE_MODEL_DEVICE = "cpu"
 $env:TOUCHWRITE_SMOOTHING_ENABLED = "true"
 $env:TOUCHWRITE_SAVE_SAMPLES = "true"
+$env:TOUCHWRITE_PREVIEW_DEBOUNCE_MS = "500"
+$env:TOUCHWRITE_AUTOSAVE_ENABLED = "true"
 $env:TOUCHWRITE_DEBUG_INPUT = "false"
 $env:TOUCHWRITE_DEBUG_RECOGNITION = "false"
 python -m touchwrite.app.main
 ```
 
 See `touchwrite/config/settings.py` for all typed defaults.
+
+The latest document is atomically autosaved to `data/documents/latest.json` and restored on the
+next launch. Use **Export** for a plain-text copy. Streaming and accuracy measurements are shown
+under **Diagnostics**; the golden-sample result is documented in
+[`reports/whiteboard_regression.md`](reports/whiteboard_regression.md).
 
 ## Tests and lint
 
