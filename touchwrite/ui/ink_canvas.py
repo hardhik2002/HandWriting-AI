@@ -6,9 +6,10 @@ import math
 import time
 from dataclasses import dataclass
 
-from PySide6.QtCore import QEvent, QEventPoint, QPointF, QRectF, Qt, Signal
+from PySide6.QtCore import QEvent, QPointF, QRectF, Qt, Signal
 from PySide6.QtGui import (
     QColor,
+    QEventPoint,
     QFont,
     QFontMetricsF,
     QMouseEvent,
@@ -47,6 +48,7 @@ class InkCanvas(QWidget):
 
     ink_changed = Signal()
     stroke_started = Signal()
+    stroke_ended = Signal()
     space_requested = Signal()
 
     def __init__(self, settings: Settings, parent: QWidget | None = None) -> None:
@@ -82,6 +84,13 @@ class InkCanvas(QWidget):
 
     def snapshot(self) -> HandwrittenWord:
         return self.buffer.snapshot()
+
+    @property
+    def input_active(self) -> bool:
+        return (
+            self.buffer.active_stroke is not None
+            or self.touchscreen_provider.active_contact_id is not None
+        )
 
     def active_writing_rect(self) -> QRectF:
         return QRectF(self.rect()).adjusted(24.0, 18.0, -24.0, -18.0)
@@ -119,15 +128,19 @@ class InkCanvas(QWidget):
         self.ink_changed.emit()
 
     def event(self, event: QEvent) -> bool:
-        if event.type() in {
+        if (
+            event.type()
+            in {
             QEvent.Type.TouchBegin,
             QEvent.Type.TouchUpdate,
             QEvent.Type.TouchEnd,
             QEvent.Type.TouchCancel,
-        }:
-            if self.input_mode == "touchscreen" and isinstance(event, QTouchEvent):
-                self._handle_touch_event(event)
-                return True
+            }
+            and self.input_mode == "touchscreen"
+            and isinstance(event, QTouchEvent)
+        ):
+            self._handle_touch_event(event)
+            return True
         return super().event(event)
 
     def mousePressEvent(self, event: QMouseEvent) -> None:  # noqa: N802
@@ -175,6 +188,7 @@ class InkCanvas(QWidget):
             self.buffer.end(self._mouse_point(position, finger_down=False))
             self.update()
             self.ink_changed.emit()
+            self.stroke_ended.emit()
             event.accept()
             return
         super().mouseReleaseEvent(event)
@@ -257,11 +271,16 @@ class InkCanvas(QWidget):
             self.buffer.finalize_active()
             self.touchscreen_provider.cancel()
             self.ink_changed.emit()
+            self.stroke_ended.emit()
             event.accept()
             return
         for event_point in event.points():
             state = event_point.state()
-            local = canvas_to_document(event_point.position())
+            event_position = event_point.position()
+            if event_position.isNull() and not event_point.scenePosition().isNull():
+                # Programmatically constructed Qt test events expose only scenePosition.
+                event_position = event_point.scenePosition()
+            local = canvas_to_document(event_position)
             global_position = event_point.globalPosition()
             transformed = global_to_canvas(self, global_position)
             pressure = event_point.pressure()
@@ -303,6 +322,7 @@ class InkCanvas(QWidget):
                 if point is not None and self.buffer.active_stroke is not None:
                     self.buffer.end(point)
                     self.ink_changed.emit()
+                    self.stroke_ended.emit()
             if point is not None:
                 self._queue_diagnostic(
                     event,

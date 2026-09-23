@@ -8,6 +8,7 @@ import threading
 import time
 from collections import OrderedDict, deque
 from collections.abc import Callable
+from copy import deepcopy
 from dataclasses import asdict, dataclass
 from typing import Literal
 
@@ -94,6 +95,8 @@ class StreamMetrics:
 @dataclass(frozen=True, slots=True)
 class _CachedRecognition:
     outcome: CommitOutcome
+    revision_id: int
+    source_kind: Literal["preview", "commit"]
 
 
 class RecognitionStream:
@@ -106,12 +109,14 @@ class RecognitionStream:
         on_preview: Callable[[RecognitionEvent], None] | None = None,
         on_commit: Callable[[RecognitionEvent], None] | None = None,
         on_failure: Callable[[RecognitionFailure], None] | None = None,
+        on_trace: Callable[..., None] | None = None,
         cache_size: int = 128,
     ) -> None:
         self.service = service
         self.on_preview = on_preview or (lambda _event: None)
         self.on_commit = on_commit or (lambda _event: None)
         self.on_failure = on_failure or (lambda _failure: None)
+        self.on_trace = on_trace or (lambda _event, **_details: None)
         self.cache_size = cache_size
         self.metrics = StreamMetrics()
         self._condition = threading.Condition()
@@ -138,8 +143,9 @@ class RecognitionStream:
         *,
         scheduled_at: float | None = None,
     ) -> str:
-        fingerprint = trajectory_hash(word)
-        request = RecognitionRequest("preview", word, fingerprint, revision_id, context)
+        snapshot = deepcopy(word)
+        fingerprint = trajectory_hash(snapshot)
+        request = RecognitionRequest("preview", snapshot, fingerprint, revision_id, context)
         with self._condition:
             if self._stopping:
                 return fingerprint
@@ -150,6 +156,13 @@ class RecognitionStream:
                     0.0, (time.perf_counter() - scheduled_at) * 1000
                 )
             self._condition.notify()
+        self.on_trace(
+            "preview_snapshot_created",
+            revision_id=revision_id,
+            trajectory_hash=fingerprint,
+            stroke_count=len(snapshot.strokes),
+            point_count=sum(len(stroke.points) for stroke in snapshot.strokes),
+        )
         return fingerprint
 
     def request_commit(
@@ -163,10 +176,11 @@ class RecognitionStream:
         line_index: int,
         word_index: int,
     ) -> str:
-        fingerprint = trajectory_hash(word)
+        snapshot = deepcopy(word)
+        fingerprint = trajectory_hash(snapshot)
         request = RecognitionRequest(
             "commit",
-            word,
+            snapshot,
             fingerprint,
             revision_id,
             context,
@@ -180,7 +194,21 @@ class RecognitionStream:
                 return fingerprint
             self._commit_queue.append(request)
             self._condition.notify()
+        self.on_trace(
+            "commit_snapshot_created",
+            revision_id=revision_id,
+            commit_sequence_id=commit_sequence_id,
+            trajectory_hash=fingerprint,
+            stroke_count=len(snapshot.strokes),
+            point_count=sum(len(stroke.points) for stroke in snapshot.strokes),
+        )
         return fingerprint
+
+    def cancel_pending_preview(self, current_revision_id: int) -> None:
+        """Invalidate queued previews at a word boundary; running work becomes stale."""
+        with self._condition:
+            self._pending_preview = None
+            self._current_revision_id = max(self._current_revision_id, current_revision_id)
 
     def snapshot_metrics(self) -> StreamMetrics:
         with self._condition:
@@ -221,9 +249,17 @@ class RecognitionStream:
         try:
             if request.kind == "commit":
                 self._apply_commit_metadata(request)
-                if cached is not None:
+                reusable = (
+                    cached is not None
+                    and cached.source_kind == "preview"
+                    and cached.revision_id == request.revision_id
+                )
+                if reusable and cached is not None:
                     outcome = self.service.commit_cached(
-                        request.word, cached.outcome.result, request.context
+                        request.word,
+                        cached.outcome.result,
+                        request.context,
+                        source_word=cached.outcome.word,
                     )
                     cache_reused = True
                 else:
@@ -235,15 +271,28 @@ class RecognitionStream:
                     self.metrics.completed_commits += 1
                     self.metrics.cache_reuse_count += int(cache_reused)
                     self._observe_model_load(outcome)
-                self._put_cache(request.fingerprint, outcome)
+                self._put_cache(request, outcome)
+                self.on_trace(
+                    "commit_finished",
+                    revision_id=request.revision_id,
+                    commit_sequence_id=request.commit_sequence_id,
+                    trajectory_hash=request.fingerprint,
+                    cache_reused=cache_reused,
+                    prediction=outcome.inserted_text,
+                )
                 self.on_commit(RecognitionEvent(request, outcome, cache_reused))
                 return
 
-            if cached is not None:
+            reusable_preview = (
+                cached is not None
+                and cached.source_kind == "preview"
+                and cached.revision_id == request.revision_id
+            )
+            if reusable_preview and cached is not None:
                 outcome = cached.outcome
             else:
                 outcome = self.service.preview(request.word, request.context)
-                self._put_cache(request.fingerprint, outcome)
+                self._put_cache(request, outcome)
             elapsed = (time.perf_counter() - started) * 1000
             with self._condition:
                 self.metrics.preview_inference_ms = elapsed
@@ -253,7 +302,14 @@ class RecognitionStream:
                 if stale:
                     self.metrics.stale_preview_discard_count += 1
             if not stale:
-                self.on_preview(RecognitionEvent(request, outcome, cached is not None))
+                self.on_preview(RecognitionEvent(request, outcome, reusable_preview))
+            self.on_trace(
+                "preview_finished",
+                revision_id=request.revision_id,
+                trajectory_hash=request.fingerprint,
+                stale=stale,
+                prediction=outcome.inserted_text,
+            )
         except Exception as error:  # worker boundary: report recoverable failures to the UI
             self.on_failure(RecognitionFailure(request, str(error)))
 
@@ -268,9 +324,11 @@ class RecognitionStream:
             "revision_id": request.revision_id,
         }
 
-    def _put_cache(self, fingerprint: str, outcome: CommitOutcome) -> None:
-        self._cache[fingerprint] = _CachedRecognition(outcome)
-        self._cache.move_to_end(fingerprint)
+    def _put_cache(self, request: RecognitionRequest, outcome: CommitOutcome) -> None:
+        self._cache[request.fingerprint] = _CachedRecognition(
+            outcome, request.revision_id, request.kind
+        )
+        self._cache.move_to_end(request.fingerprint)
         while len(self._cache) > self.cache_size:
             self._cache.popitem(last=False)
 

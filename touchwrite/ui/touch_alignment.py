@@ -9,14 +9,22 @@ import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
-from PySide6.QtCore import QEvent, QEventPoint, QPointF, Qt, Signal
-from PySide6.QtGui import QColor, QMouseEvent, QPainter, QPen, QPointingDevice, QTouchEvent
+from PySide6.QtCore import QEvent, QPointF, Qt, Signal
+from PySide6.QtGui import (
+    QColor,
+    QEventPoint,
+    QMouseEvent,
+    QPainter,
+    QPen,
+    QPointingDevice,
+    QTouchEvent,
+)
 from PySide6.QtWidgets import QDialog, QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWidget
 
 from touchwrite.ui.coordinate_mapper import global_to_canvas
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(slots=True)
 class AlignmentResult:
     target: tuple[float, float]
     reported_event_position: tuple[float, float]
@@ -25,6 +33,10 @@ class AlignmentResult:
     mapping_error_px: float
     timestamp_ns: int
     device_pixel_ratio: float
+    event_type: str
+    device_type: str
+    paint_timestamp_ns: int | None = None
+    pointer_to_ink_latency_ms: float | None = None
 
 
 class TouchAlignmentCanvas(QWidget):
@@ -58,12 +70,25 @@ class TouchAlignmentCanvas(QWidget):
             return {"samples": 0}
         target_errors = [result.target_error_px for result in self.results]
         mapping_errors = [result.mapping_error_px for result in self.results]
+        latencies = [
+            result.pointer_to_ink_latency_ms
+            for result in self.results
+            if result.pointer_to_ink_latency_ms is not None
+        ]
         return {
             "samples": len(self.results),
             "median_target_error_px": statistics.median(target_errors),
             "max_target_error_px": max(target_errors),
             "median_mapping_error_px": statistics.median(mapping_errors),
             "max_mapping_error_px": max(mapping_errors),
+            "median_pointer_to_ink_latency_ms": (
+                statistics.median(latencies) if latencies else None
+            ),
+            "p95_pointer_to_ink_latency_ms": (
+                sorted(latencies)[min(len(latencies) - 1, int(0.95 * (len(latencies) - 1)))]
+                if latencies
+                else None
+            ),
         }
 
     def event(self, event: QEvent) -> bool:
@@ -77,7 +102,13 @@ class TouchAlignmentCanvas(QWidget):
                 None,
             )
             if pressed is not None:
-                self.record_touch(pressed.position(), pressed.globalPosition())
+                device = event.pointingDevice()
+                self.record_touch(
+                    pressed.position(),
+                    pressed.globalPosition(),
+                    event_type="QTouchEvent",
+                    device_type=device.type().name if device is not None else "Unknown",
+                )
             event.accept()
             return True
         if event.type() in {
@@ -99,12 +130,24 @@ class TouchAlignmentCanvas(QWidget):
             event.accept()
             return
         if event.button() == Qt.MouseButton.LeftButton:
-            self.record_touch(event.position(), event.globalPosition())
+            self.record_touch(
+                event.position(),
+                event.globalPosition(),
+                event_type="QMouseEvent",
+                device_type=device.type().name if device is not None else "Unknown",
+            )
             event.accept()
             return
         super().mousePressEvent(event)
 
-    def record_touch(self, local: QPointF, global_position: QPointF) -> None:
+    def record_touch(
+        self,
+        local: QPointF,
+        global_position: QPointF,
+        *,
+        event_type: str = "SyntheticTest",
+        device_type: str = "Unknown",
+    ) -> None:
         targets = self.targets()
         if len(self.results) >= len(targets):
             return
@@ -122,6 +165,8 @@ class TouchAlignmentCanvas(QWidget):
             ),
             timestamp_ns=time.perf_counter_ns(),
             device_pixel_ratio=self.devicePixelRatioF(),
+            event_type=event_type,
+            device_type=device_type,
         )
         self.results.append(result)
         self._save()
@@ -149,6 +194,17 @@ class TouchAlignmentCanvas(QWidget):
                 QPointF(*result.transformed_position),
                 8,
             )
+        paint_timestamp_ns = time.perf_counter_ns()
+        changed = False
+        for result in self.results:
+            if result.paint_timestamp_ns is None:
+                result.paint_timestamp_ns = paint_timestamp_ns
+                result.pointer_to_ink_latency_ms = max(
+                    0.0, (paint_timestamp_ns - result.timestamp_ns) / 1_000_000
+                )
+                changed = True
+        if changed:
+            self._save()
 
     def _save(self) -> None:
         self.output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -210,5 +266,6 @@ class TouchAlignmentDialog(QDialog):
             f"Targets: {metrics['samples']}/9 · "
             f"median target error {metrics['median_target_error_px']:.1f}px · "
             f"max {metrics['max_target_error_px']:.1f}px · "
-            f"mapping error {metrics['max_mapping_error_px']:.2f}px max"
+            f"mapping error {metrics['max_mapping_error_px']:.2f}px max · "
+            f"median latency {metrics['median_pointer_to_ink_latency_ms'] or 0:.1f}ms"
         )

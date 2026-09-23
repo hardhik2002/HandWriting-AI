@@ -1,13 +1,1489 @@
 {
   "version": 1,
-  "document_id": "e60a5cb6-b29d-40c3-8d05-d157257e153b",
-  "current_line_index": 0,
+  "document_id": "86d4e1da-bb94-4b5f-a2c5-f23d7b339859",
+  "current_line_index": 1,
   "lines": [
+    {
+      "words": [
+        {
+          "commit_sequence_id": 16,
+          "text": "in hour more slow , I am headline",
+          "source_sample_id": "867e9223-a4b1-4864-ac7e-0d6905d26802",
+          "recognition_metadata": {
+            "trajectory_hash": "3812c2205e0022c8b73da13e39ea085fdb28f3bfbdab2f7c926e25d244f17c2a",
+            "inference_duration_ms": 9357.86970006302,
+            "cache_reused": false,
+            "model_name": "microsoft/trocr-base-handwritten"
+          },
+          "failed": false
+        }
+      ],
+      "trailing_space": false
+    },
     {
       "words": [],
       "trailing_space": false
     }
   ],
-  "undo": [],
+  "undo": [
+    {
+      "label": "commit:1",
+      "state": {
+        "version": 1,
+        "document_id": "e60a5cb6-b29d-40c3-8d05-d157257e153b",
+        "current_line_index": 0,
+        "lines": [
+          {
+            "words": [],
+            "trailing_space": false
+          }
+        ]
+      }
+    },
+    {
+      "label": "commit:2",
+      "state": {
+        "version": 1,
+        "document_id": "e60a5cb6-b29d-40c3-8d05-d157257e153b",
+        "current_line_index": 1,
+        "lines": [
+          {
+            "words": [
+              {
+                "commit_sequence_id": 1,
+                "text": "cadel",
+                "source_sample_id": "c2791820-d847-4be8-9479-3249229c5551",
+                "recognition_metadata": {
+                  "trajectory_hash": "84e474436de152c87db523101f472fe4219045863a2f8039b8cfedec4bf03881",
+                  "inference_duration_ms": 4747.99930001609,
+                  "cache_reused": false,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [],
+            "trailing_space": false
+          }
+        ]
+      }
+    },
+    {
+      "label": "commit:3",
+      "state": {
+        "version": 1,
+        "document_id": "e60a5cb6-b29d-40c3-8d05-d157257e153b",
+        "current_line_index": 2,
+        "lines": [
+          {
+            "words": [
+              {
+                "commit_sequence_id": 1,
+                "text": "cadel",
+                "source_sample_id": "c2791820-d847-4be8-9479-3249229c5551",
+                "recognition_metadata": {
+                  "trajectory_hash": "84e474436de152c87db523101f472fe4219045863a2f8039b8cfedec4bf03881",
+                  "inference_duration_ms": 4747.99930001609,
+                  "cache_reused": false,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 2,
+                "text": "6 Achievements .",
+                "source_sample_id": "92775f85-74fb-4f9c-91c7-5facf4b9e90f",
+                "recognition_metadata": {
+                  "trajectory_hash": "3506c2e0a1985b015eb8ca2042f8066c9208889163e0d9845c66d320c768e663",
+                  "inference_duration_ms": 2442.387399962172,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [],
+            "trailing_space": false
+          }
+        ]
+      }
+    },
+    {
+      "label": "new-document",
+      "state": {
+        "version": 1,
+        "document_id": "e60a5cb6-b29d-40c3-8d05-d157257e153b",
+        "current_line_index": 2,
+        "lines": [
+          {
+            "words": [
+              {
+                "commit_sequence_id": 1,
+                "text": "cadel",
+                "source_sample_id": "c2791820-d847-4be8-9479-3249229c5551",
+                "recognition_metadata": {
+                  "trajectory_hash": "84e474436de152c87db523101f472fe4219045863a2f8039b8cfedec4bf03881",
+                  "inference_duration_ms": 4747.99930001609,
+                  "cache_reused": false,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 2,
+                "text": "6 Achievements .",
+                "source_sample_id": "92775f85-74fb-4f9c-91c7-5facf4b9e90f",
+                "recognition_metadata": {
+                  "trajectory_hash": "3506c2e0a1985b015eb8ca2042f8066c9208889163e0d9845c66d320c768e663",
+                  "inference_duration_ms": 2442.387399962172,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 3,
+                "text": "n. n.i.",
+                "source_sample_id": "7d185980-00f8-4ba1-9cc7-b55da69baf04",
+                "recognition_metadata": {
+                  "trajectory_hash": "5094edac28b75a4976c9204557931ac3196637c17ead9a60c1270967726f589d",
+                  "inference_duration_ms": 4035.993800032884,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": true
+          }
+        ]
+      }
+    },
+    {
+      "label": "commit:4",
+      "state": {
+        "version": 1,
+        "document_id": "93c4eb7b-76a1-4305-9871-990038612568",
+        "current_line_index": 0,
+        "lines": [
+          {
+            "words": [],
+            "trailing_space": false
+          }
+        ]
+      }
+    },
+    {
+      "label": "commit:5",
+      "state": {
+        "version": 1,
+        "document_id": "93c4eb7b-76a1-4305-9871-990038612568",
+        "current_line_index": 1,
+        "lines": [
+          {
+            "words": [
+              {
+                "commit_sequence_id": 4,
+                "text": "32h.i",
+                "source_sample_id": "3332b0a3-8944-4d93-b914-a07b52d9a6a1",
+                "recognition_metadata": {
+                  "trajectory_hash": "d0f0563361dc802d40ecea3e0ddfae1215f9a824138ade0c52d623cc17ad9225",
+                  "inference_duration_ms": 2774.81460000854,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [],
+            "trailing_space": false
+          }
+        ]
+      }
+    },
+    {
+      "label": "commit:6",
+      "state": {
+        "version": 1,
+        "document_id": "93c4eb7b-76a1-4305-9871-990038612568",
+        "current_line_index": 2,
+        "lines": [
+          {
+            "words": [
+              {
+                "commit_sequence_id": 4,
+                "text": "32h.i",
+                "source_sample_id": "3332b0a3-8944-4d93-b914-a07b52d9a6a1",
+                "recognition_metadata": {
+                  "trajectory_hash": "d0f0563361dc802d40ecea3e0ddfae1215f9a824138ade0c52d623cc17ad9225",
+                  "inference_duration_ms": 2774.81460000854,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 5,
+                "text": "how are you",
+                "source_sample_id": "efe0c4bc-b4f4-443f-9cf1-a65301bcfc30",
+                "recognition_metadata": {
+                  "trajectory_hash": "7531894e55b9a82275c779ec1d2c30857218d5397aede7068fae6ec1a50a9f87",
+                  "inference_duration_ms": 2891.0939999623224,
+                  "cache_reused": false,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [],
+            "trailing_space": false
+          }
+        ]
+      }
+    },
+    {
+      "label": "commit:7",
+      "state": {
+        "version": 1,
+        "document_id": "93c4eb7b-76a1-4305-9871-990038612568",
+        "current_line_index": 3,
+        "lines": [
+          {
+            "words": [
+              {
+                "commit_sequence_id": 4,
+                "text": "32h.i",
+                "source_sample_id": "3332b0a3-8944-4d93-b914-a07b52d9a6a1",
+                "recognition_metadata": {
+                  "trajectory_hash": "d0f0563361dc802d40ecea3e0ddfae1215f9a824138ade0c52d623cc17ad9225",
+                  "inference_duration_ms": 2774.81460000854,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 5,
+                "text": "how are you",
+                "source_sample_id": "efe0c4bc-b4f4-443f-9cf1-a65301bcfc30",
+                "recognition_metadata": {
+                  "trajectory_hash": "7531894e55b9a82275c779ec1d2c30857218d5397aede7068fae6ec1a50a9f87",
+                  "inference_duration_ms": 2891.0939999623224,
+                  "cache_reused": false,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 6,
+                "text": "32h.i",
+                "source_sample_id": "c925800f-8553-4a7d-83e7-304728023d6c",
+                "recognition_metadata": {
+                  "trajectory_hash": "eb508080f7f4e827372f652619209502e71754dbde020a6afc1896b4854c23c7",
+                  "inference_duration_ms": 3499.4210000149906,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [],
+            "trailing_space": false
+          }
+        ]
+      }
+    },
+    {
+      "label": "commit:8",
+      "state": {
+        "version": 1,
+        "document_id": "93c4eb7b-76a1-4305-9871-990038612568",
+        "current_line_index": 4,
+        "lines": [
+          {
+            "words": [
+              {
+                "commit_sequence_id": 4,
+                "text": "32h.i",
+                "source_sample_id": "3332b0a3-8944-4d93-b914-a07b52d9a6a1",
+                "recognition_metadata": {
+                  "trajectory_hash": "d0f0563361dc802d40ecea3e0ddfae1215f9a824138ade0c52d623cc17ad9225",
+                  "inference_duration_ms": 2774.81460000854,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 5,
+                "text": "how are you",
+                "source_sample_id": "efe0c4bc-b4f4-443f-9cf1-a65301bcfc30",
+                "recognition_metadata": {
+                  "trajectory_hash": "7531894e55b9a82275c779ec1d2c30857218d5397aede7068fae6ec1a50a9f87",
+                  "inference_duration_ms": 2891.0939999623224,
+                  "cache_reused": false,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 6,
+                "text": "32h.i",
+                "source_sample_id": "c925800f-8553-4a7d-83e7-304728023d6c",
+                "recognition_metadata": {
+                  "trajectory_hash": "eb508080f7f4e827372f652619209502e71754dbde020a6afc1896b4854c23c7",
+                  "inference_duration_ms": 3499.4210000149906,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 7,
+                "text": "where are you",
+                "source_sample_id": "00e77c8c-b06a-4c5f-9c37-1e6788d44ba5",
+                "recognition_metadata": {
+                  "trajectory_hash": "7470dd7806ff82228a3a78f34c5d3507de303f049191a71c91129ae21f5f9978",
+                  "inference_duration_ms": 2801.9476999761537,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [],
+            "trailing_space": false
+          }
+        ]
+      }
+    },
+    {
+      "label": "commit:9",
+      "state": {
+        "version": 1,
+        "document_id": "93c4eb7b-76a1-4305-9871-990038612568",
+        "current_line_index": 5,
+        "lines": [
+          {
+            "words": [
+              {
+                "commit_sequence_id": 4,
+                "text": "32h.i",
+                "source_sample_id": "3332b0a3-8944-4d93-b914-a07b52d9a6a1",
+                "recognition_metadata": {
+                  "trajectory_hash": "d0f0563361dc802d40ecea3e0ddfae1215f9a824138ade0c52d623cc17ad9225",
+                  "inference_duration_ms": 2774.81460000854,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 5,
+                "text": "how are you",
+                "source_sample_id": "efe0c4bc-b4f4-443f-9cf1-a65301bcfc30",
+                "recognition_metadata": {
+                  "trajectory_hash": "7531894e55b9a82275c779ec1d2c30857218d5397aede7068fae6ec1a50a9f87",
+                  "inference_duration_ms": 2891.0939999623224,
+                  "cache_reused": false,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 6,
+                "text": "32h.i",
+                "source_sample_id": "c925800f-8553-4a7d-83e7-304728023d6c",
+                "recognition_metadata": {
+                  "trajectory_hash": "eb508080f7f4e827372f652619209502e71754dbde020a6afc1896b4854c23c7",
+                  "inference_duration_ms": 3499.4210000149906,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 7,
+                "text": "where are you",
+                "source_sample_id": "00e77c8c-b06a-4c5f-9c37-1e6788d44ba5",
+                "recognition_metadata": {
+                  "trajectory_hash": "7470dd7806ff82228a3a78f34c5d3507de303f049191a71c91129ae21f5f9978",
+                  "inference_duration_ms": 2801.9476999761537,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 8,
+                "text": "shai",
+                "source_sample_id": "453f1d92-0018-4ffe-ab7c-65f6daaa81a3",
+                "recognition_metadata": {
+                  "trajectory_hash": "f53b3ee9d82352e72929e21d13df70d65276e8e513c913323fdc95ba81bec9e5",
+                  "inference_duration_ms": 2375.197399989702,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [],
+            "trailing_space": false
+          }
+        ]
+      }
+    },
+    {
+      "label": "commit:10",
+      "state": {
+        "version": 1,
+        "document_id": "93c4eb7b-76a1-4305-9871-990038612568",
+        "current_line_index": 6,
+        "lines": [
+          {
+            "words": [
+              {
+                "commit_sequence_id": 4,
+                "text": "32h.i",
+                "source_sample_id": "3332b0a3-8944-4d93-b914-a07b52d9a6a1",
+                "recognition_metadata": {
+                  "trajectory_hash": "d0f0563361dc802d40ecea3e0ddfae1215f9a824138ade0c52d623cc17ad9225",
+                  "inference_duration_ms": 2774.81460000854,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 5,
+                "text": "how are you",
+                "source_sample_id": "efe0c4bc-b4f4-443f-9cf1-a65301bcfc30",
+                "recognition_metadata": {
+                  "trajectory_hash": "7531894e55b9a82275c779ec1d2c30857218d5397aede7068fae6ec1a50a9f87",
+                  "inference_duration_ms": 2891.0939999623224,
+                  "cache_reused": false,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 6,
+                "text": "32h.i",
+                "source_sample_id": "c925800f-8553-4a7d-83e7-304728023d6c",
+                "recognition_metadata": {
+                  "trajectory_hash": "eb508080f7f4e827372f652619209502e71754dbde020a6afc1896b4854c23c7",
+                  "inference_duration_ms": 3499.4210000149906,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 7,
+                "text": "where are you",
+                "source_sample_id": "00e77c8c-b06a-4c5f-9c37-1e6788d44ba5",
+                "recognition_metadata": {
+                  "trajectory_hash": "7470dd7806ff82228a3a78f34c5d3507de303f049191a71c91129ae21f5f9978",
+                  "inference_duration_ms": 2801.9476999761537,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 8,
+                "text": "shai",
+                "source_sample_id": "453f1d92-0018-4ffe-ab7c-65f6daaa81a3",
+                "recognition_metadata": {
+                  "trajectory_hash": "f53b3ee9d82352e72929e21d13df70d65276e8e513c913323fdc95ba81bec9e5",
+                  "inference_duration_ms": 2375.197399989702,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 9,
+                "text": "hardhijk",
+                "source_sample_id": "98ae9fd3-cb6c-4533-84f2-6a9fd66f5a8a",
+                "recognition_metadata": {
+                  "trajectory_hash": "e6067a5c9f092c45e8df8be9b30e069fe09c9b6a19ce0e8e0096ac2fbd2230a4",
+                  "inference_duration_ms": 2897.171500022523,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [],
+            "trailing_space": false
+          }
+        ]
+      }
+    },
+    {
+      "label": "commit:11",
+      "state": {
+        "version": 1,
+        "document_id": "93c4eb7b-76a1-4305-9871-990038612568",
+        "current_line_index": 7,
+        "lines": [
+          {
+            "words": [
+              {
+                "commit_sequence_id": 4,
+                "text": "32h.i",
+                "source_sample_id": "3332b0a3-8944-4d93-b914-a07b52d9a6a1",
+                "recognition_metadata": {
+                  "trajectory_hash": "d0f0563361dc802d40ecea3e0ddfae1215f9a824138ade0c52d623cc17ad9225",
+                  "inference_duration_ms": 2774.81460000854,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 5,
+                "text": "how are you",
+                "source_sample_id": "efe0c4bc-b4f4-443f-9cf1-a65301bcfc30",
+                "recognition_metadata": {
+                  "trajectory_hash": "7531894e55b9a82275c779ec1d2c30857218d5397aede7068fae6ec1a50a9f87",
+                  "inference_duration_ms": 2891.0939999623224,
+                  "cache_reused": false,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 6,
+                "text": "32h.i",
+                "source_sample_id": "c925800f-8553-4a7d-83e7-304728023d6c",
+                "recognition_metadata": {
+                  "trajectory_hash": "eb508080f7f4e827372f652619209502e71754dbde020a6afc1896b4854c23c7",
+                  "inference_duration_ms": 3499.4210000149906,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 7,
+                "text": "where are you",
+                "source_sample_id": "00e77c8c-b06a-4c5f-9c37-1e6788d44ba5",
+                "recognition_metadata": {
+                  "trajectory_hash": "7470dd7806ff82228a3a78f34c5d3507de303f049191a71c91129ae21f5f9978",
+                  "inference_duration_ms": 2801.9476999761537,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 8,
+                "text": "shai",
+                "source_sample_id": "453f1d92-0018-4ffe-ab7c-65f6daaa81a3",
+                "recognition_metadata": {
+                  "trajectory_hash": "f53b3ee9d82352e72929e21d13df70d65276e8e513c913323fdc95ba81bec9e5",
+                  "inference_duration_ms": 2375.197399989702,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 9,
+                "text": "hardhijk",
+                "source_sample_id": "98ae9fd3-cb6c-4533-84f2-6a9fd66f5a8a",
+                "recognition_metadata": {
+                  "trajectory_hash": "e6067a5c9f092c45e8df8be9b30e069fe09c9b6a19ce0e8e0096ac2fbd2230a4",
+                  "inference_duration_ms": 2897.171500022523,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 10,
+                "text": "Colonel and work located , cs.",
+                "source_sample_id": "218450a6-9191-4e98-bbda-cb351a201e5b",
+                "recognition_metadata": {
+                  "trajectory_hash": "48239c21133c5d4c896877f7bf79959b2682221b25c61a021670911685d2ece8",
+                  "inference_duration_ms": 5342.878700001165,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [],
+            "trailing_space": false
+          }
+        ]
+      }
+    },
+    {
+      "label": "commit:12",
+      "state": {
+        "version": 1,
+        "document_id": "93c4eb7b-76a1-4305-9871-990038612568",
+        "current_line_index": 8,
+        "lines": [
+          {
+            "words": [
+              {
+                "commit_sequence_id": 4,
+                "text": "32h.i",
+                "source_sample_id": "3332b0a3-8944-4d93-b914-a07b52d9a6a1",
+                "recognition_metadata": {
+                  "trajectory_hash": "d0f0563361dc802d40ecea3e0ddfae1215f9a824138ade0c52d623cc17ad9225",
+                  "inference_duration_ms": 2774.81460000854,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 5,
+                "text": "how are you",
+                "source_sample_id": "efe0c4bc-b4f4-443f-9cf1-a65301bcfc30",
+                "recognition_metadata": {
+                  "trajectory_hash": "7531894e55b9a82275c779ec1d2c30857218d5397aede7068fae6ec1a50a9f87",
+                  "inference_duration_ms": 2891.0939999623224,
+                  "cache_reused": false,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 6,
+                "text": "32h.i",
+                "source_sample_id": "c925800f-8553-4a7d-83e7-304728023d6c",
+                "recognition_metadata": {
+                  "trajectory_hash": "eb508080f7f4e827372f652619209502e71754dbde020a6afc1896b4854c23c7",
+                  "inference_duration_ms": 3499.4210000149906,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 7,
+                "text": "where are you",
+                "source_sample_id": "00e77c8c-b06a-4c5f-9c37-1e6788d44ba5",
+                "recognition_metadata": {
+                  "trajectory_hash": "7470dd7806ff82228a3a78f34c5d3507de303f049191a71c91129ae21f5f9978",
+                  "inference_duration_ms": 2801.9476999761537,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 8,
+                "text": "shai",
+                "source_sample_id": "453f1d92-0018-4ffe-ab7c-65f6daaa81a3",
+                "recognition_metadata": {
+                  "trajectory_hash": "f53b3ee9d82352e72929e21d13df70d65276e8e513c913323fdc95ba81bec9e5",
+                  "inference_duration_ms": 2375.197399989702,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 9,
+                "text": "hardhijk",
+                "source_sample_id": "98ae9fd3-cb6c-4533-84f2-6a9fd66f5a8a",
+                "recognition_metadata": {
+                  "trajectory_hash": "e6067a5c9f092c45e8df8be9b30e069fe09c9b6a19ce0e8e0096ac2fbd2230a4",
+                  "inference_duration_ms": 2897.171500022523,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 10,
+                "text": "Colonel and work located , cs.",
+                "source_sample_id": "218450a6-9191-4e98-bbda-cb351a201e5b",
+                "recognition_metadata": {
+                  "trajectory_hash": "48239c21133c5d4c896877f7bf79959b2682221b25c61a021670911685d2ece8",
+                  "inference_duration_ms": 5342.878700001165,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 11,
+                "text": "coded",
+                "source_sample_id": "30a84dab-153a-4265-8a96-6ec51eda7039",
+                "recognition_metadata": {
+                  "trajectory_hash": "65dfefe7a44b1abbd854fbaa08495a7d91129eb2ee4ef53292e965bf131d967c",
+                  "inference_duration_ms": 2613.9343000249937,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [],
+            "trailing_space": false
+          }
+        ]
+      }
+    },
+    {
+      "label": "commit:13",
+      "state": {
+        "version": 1,
+        "document_id": "93c4eb7b-76a1-4305-9871-990038612568",
+        "current_line_index": 9,
+        "lines": [
+          {
+            "words": [
+              {
+                "commit_sequence_id": 4,
+                "text": "32h.i",
+                "source_sample_id": "3332b0a3-8944-4d93-b914-a07b52d9a6a1",
+                "recognition_metadata": {
+                  "trajectory_hash": "d0f0563361dc802d40ecea3e0ddfae1215f9a824138ade0c52d623cc17ad9225",
+                  "inference_duration_ms": 2774.81460000854,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 5,
+                "text": "how are you",
+                "source_sample_id": "efe0c4bc-b4f4-443f-9cf1-a65301bcfc30",
+                "recognition_metadata": {
+                  "trajectory_hash": "7531894e55b9a82275c779ec1d2c30857218d5397aede7068fae6ec1a50a9f87",
+                  "inference_duration_ms": 2891.0939999623224,
+                  "cache_reused": false,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 6,
+                "text": "32h.i",
+                "source_sample_id": "c925800f-8553-4a7d-83e7-304728023d6c",
+                "recognition_metadata": {
+                  "trajectory_hash": "eb508080f7f4e827372f652619209502e71754dbde020a6afc1896b4854c23c7",
+                  "inference_duration_ms": 3499.4210000149906,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 7,
+                "text": "where are you",
+                "source_sample_id": "00e77c8c-b06a-4c5f-9c37-1e6788d44ba5",
+                "recognition_metadata": {
+                  "trajectory_hash": "7470dd7806ff82228a3a78f34c5d3507de303f049191a71c91129ae21f5f9978",
+                  "inference_duration_ms": 2801.9476999761537,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 8,
+                "text": "shai",
+                "source_sample_id": "453f1d92-0018-4ffe-ab7c-65f6daaa81a3",
+                "recognition_metadata": {
+                  "trajectory_hash": "f53b3ee9d82352e72929e21d13df70d65276e8e513c913323fdc95ba81bec9e5",
+                  "inference_duration_ms": 2375.197399989702,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 9,
+                "text": "hardhijk",
+                "source_sample_id": "98ae9fd3-cb6c-4533-84f2-6a9fd66f5a8a",
+                "recognition_metadata": {
+                  "trajectory_hash": "e6067a5c9f092c45e8df8be9b30e069fe09c9b6a19ce0e8e0096ac2fbd2230a4",
+                  "inference_duration_ms": 2897.171500022523,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 10,
+                "text": "Colonel and work located , cs.",
+                "source_sample_id": "218450a6-9191-4e98-bbda-cb351a201e5b",
+                "recognition_metadata": {
+                  "trajectory_hash": "48239c21133c5d4c896877f7bf79959b2682221b25c61a021670911685d2ece8",
+                  "inference_duration_ms": 5342.878700001165,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 11,
+                "text": "coded",
+                "source_sample_id": "30a84dab-153a-4265-8a96-6ec51eda7039",
+                "recognition_metadata": {
+                  "trajectory_hash": "65dfefe7a44b1abbd854fbaa08495a7d91129eb2ee4ef53292e965bf131d967c",
+                  "inference_duration_ms": 2613.9343000249937,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 12,
+                "text": "hardhijk",
+                "source_sample_id": "8fcb7552-111f-49af-bcdd-1016fa681ca3",
+                "recognition_metadata": {
+                  "trajectory_hash": "6ab05733bf6c89f6eedec292dc2df574d9362dfa1a1d382b60aa19eb8fc3ac49",
+                  "inference_duration_ms": 4803.6237000487745,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [],
+            "trailing_space": false
+          }
+        ]
+      }
+    },
+    {
+      "label": "commit:15",
+      "state": {
+        "version": 1,
+        "document_id": "93c4eb7b-76a1-4305-9871-990038612568",
+        "current_line_index": 10,
+        "lines": [
+          {
+            "words": [
+              {
+                "commit_sequence_id": 4,
+                "text": "32h.i",
+                "source_sample_id": "3332b0a3-8944-4d93-b914-a07b52d9a6a1",
+                "recognition_metadata": {
+                  "trajectory_hash": "d0f0563361dc802d40ecea3e0ddfae1215f9a824138ade0c52d623cc17ad9225",
+                  "inference_duration_ms": 2774.81460000854,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 5,
+                "text": "how are you",
+                "source_sample_id": "efe0c4bc-b4f4-443f-9cf1-a65301bcfc30",
+                "recognition_metadata": {
+                  "trajectory_hash": "7531894e55b9a82275c779ec1d2c30857218d5397aede7068fae6ec1a50a9f87",
+                  "inference_duration_ms": 2891.0939999623224,
+                  "cache_reused": false,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 6,
+                "text": "32h.i",
+                "source_sample_id": "c925800f-8553-4a7d-83e7-304728023d6c",
+                "recognition_metadata": {
+                  "trajectory_hash": "eb508080f7f4e827372f652619209502e71754dbde020a6afc1896b4854c23c7",
+                  "inference_duration_ms": 3499.4210000149906,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 7,
+                "text": "where are you",
+                "source_sample_id": "00e77c8c-b06a-4c5f-9c37-1e6788d44ba5",
+                "recognition_metadata": {
+                  "trajectory_hash": "7470dd7806ff82228a3a78f34c5d3507de303f049191a71c91129ae21f5f9978",
+                  "inference_duration_ms": 2801.9476999761537,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 8,
+                "text": "shai",
+                "source_sample_id": "453f1d92-0018-4ffe-ab7c-65f6daaa81a3",
+                "recognition_metadata": {
+                  "trajectory_hash": "f53b3ee9d82352e72929e21d13df70d65276e8e513c913323fdc95ba81bec9e5",
+                  "inference_duration_ms": 2375.197399989702,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 9,
+                "text": "hardhijk",
+                "source_sample_id": "98ae9fd3-cb6c-4533-84f2-6a9fd66f5a8a",
+                "recognition_metadata": {
+                  "trajectory_hash": "e6067a5c9f092c45e8df8be9b30e069fe09c9b6a19ce0e8e0096ac2fbd2230a4",
+                  "inference_duration_ms": 2897.171500022523,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 10,
+                "text": "Colonel and work located , cs.",
+                "source_sample_id": "218450a6-9191-4e98-bbda-cb351a201e5b",
+                "recognition_metadata": {
+                  "trajectory_hash": "48239c21133c5d4c896877f7bf79959b2682221b25c61a021670911685d2ece8",
+                  "inference_duration_ms": 5342.878700001165,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 11,
+                "text": "coded",
+                "source_sample_id": "30a84dab-153a-4265-8a96-6ec51eda7039",
+                "recognition_metadata": {
+                  "trajectory_hash": "65dfefe7a44b1abbd854fbaa08495a7d91129eb2ee4ef53292e965bf131d967c",
+                  "inference_duration_ms": 2613.9343000249937,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 12,
+                "text": "hardhijk",
+                "source_sample_id": "8fcb7552-111f-49af-bcdd-1016fa681ca3",
+                "recognition_metadata": {
+                  "trajectory_hash": "6ab05733bf6c89f6eedec292dc2df574d9362dfa1a1d382b60aa19eb8fc3ac49",
+                  "inference_duration_ms": 4803.6237000487745,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 13,
+                "text": "25th I.",
+                "source_sample_id": "0601206f-9beb-49eb-bce3-d855d3923e5d",
+                "recognition_metadata": {
+                  "trajectory_hash": "3c512001348d720917f84ee329e413f1ebc80fba1ec0767e04a96b15f3d149da",
+                  "inference_duration_ms": 2838.8797999359667,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [],
+            "trailing_space": false
+          }
+        ]
+      }
+    },
+    {
+      "label": "new-document",
+      "state": {
+        "version": 1,
+        "document_id": "93c4eb7b-76a1-4305-9871-990038612568",
+        "current_line_index": 11,
+        "lines": [
+          {
+            "words": [
+              {
+                "commit_sequence_id": 4,
+                "text": "32h.i",
+                "source_sample_id": "3332b0a3-8944-4d93-b914-a07b52d9a6a1",
+                "recognition_metadata": {
+                  "trajectory_hash": "d0f0563361dc802d40ecea3e0ddfae1215f9a824138ade0c52d623cc17ad9225",
+                  "inference_duration_ms": 2774.81460000854,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 5,
+                "text": "how are you",
+                "source_sample_id": "efe0c4bc-b4f4-443f-9cf1-a65301bcfc30",
+                "recognition_metadata": {
+                  "trajectory_hash": "7531894e55b9a82275c779ec1d2c30857218d5397aede7068fae6ec1a50a9f87",
+                  "inference_duration_ms": 2891.0939999623224,
+                  "cache_reused": false,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 6,
+                "text": "32h.i",
+                "source_sample_id": "c925800f-8553-4a7d-83e7-304728023d6c",
+                "recognition_metadata": {
+                  "trajectory_hash": "eb508080f7f4e827372f652619209502e71754dbde020a6afc1896b4854c23c7",
+                  "inference_duration_ms": 3499.4210000149906,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 7,
+                "text": "where are you",
+                "source_sample_id": "00e77c8c-b06a-4c5f-9c37-1e6788d44ba5",
+                "recognition_metadata": {
+                  "trajectory_hash": "7470dd7806ff82228a3a78f34c5d3507de303f049191a71c91129ae21f5f9978",
+                  "inference_duration_ms": 2801.9476999761537,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 8,
+                "text": "shai",
+                "source_sample_id": "453f1d92-0018-4ffe-ab7c-65f6daaa81a3",
+                "recognition_metadata": {
+                  "trajectory_hash": "f53b3ee9d82352e72929e21d13df70d65276e8e513c913323fdc95ba81bec9e5",
+                  "inference_duration_ms": 2375.197399989702,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 9,
+                "text": "hardhijk",
+                "source_sample_id": "98ae9fd3-cb6c-4533-84f2-6a9fd66f5a8a",
+                "recognition_metadata": {
+                  "trajectory_hash": "e6067a5c9f092c45e8df8be9b30e069fe09c9b6a19ce0e8e0096ac2fbd2230a4",
+                  "inference_duration_ms": 2897.171500022523,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 10,
+                "text": "Colonel and work located , cs.",
+                "source_sample_id": "218450a6-9191-4e98-bbda-cb351a201e5b",
+                "recognition_metadata": {
+                  "trajectory_hash": "48239c21133c5d4c896877f7bf79959b2682221b25c61a021670911685d2ece8",
+                  "inference_duration_ms": 5342.878700001165,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 11,
+                "text": "coded",
+                "source_sample_id": "30a84dab-153a-4265-8a96-6ec51eda7039",
+                "recognition_metadata": {
+                  "trajectory_hash": "65dfefe7a44b1abbd854fbaa08495a7d91129eb2ee4ef53292e965bf131d967c",
+                  "inference_duration_ms": 2613.9343000249937,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 12,
+                "text": "hardhijk",
+                "source_sample_id": "8fcb7552-111f-49af-bcdd-1016fa681ca3",
+                "recognition_metadata": {
+                  "trajectory_hash": "6ab05733bf6c89f6eedec292dc2df574d9362dfa1a1d382b60aa19eb8fc3ac49",
+                  "inference_duration_ms": 4803.6237000487745,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 13,
+                "text": "25th I.",
+                "source_sample_id": "0601206f-9beb-49eb-bce3-d855d3923e5d",
+                "recognition_metadata": {
+                  "trajectory_hash": "3c512001348d720917f84ee329e413f1ebc80fba1ec0767e04a96b15f3d149da",
+                  "inference_duration_ms": 2838.8797999359667,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 15,
+                "text": "0 1 .",
+                "source_sample_id": "1905545f-8503-40b5-9416-ae2a58f03ed3",
+                "recognition_metadata": {
+                  "trajectory_hash": "74e64d5b610d2a8b5a049b302ea689902d6c6dcd3e182da5d6ae484fe97e4075",
+                  "inference_duration_ms": 2346.4894000208005,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [],
+            "trailing_space": false
+          }
+        ]
+      }
+    },
+    {
+      "label": "commit:16",
+      "state": {
+        "version": 1,
+        "document_id": "86d4e1da-bb94-4b5f-a2c5-f23d7b339859",
+        "current_line_index": 0,
+        "lines": [
+          {
+            "words": [],
+            "trailing_space": false
+          }
+        ]
+      }
+    }
+  ],
   "redo": []
 }

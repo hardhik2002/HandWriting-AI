@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
@@ -53,9 +54,15 @@ class HandwritingService:
         word: HandwrittenWord,
         result: RecognitionResult,
         context: str = "",
+        source_word: HandwrittenWord | None = None,
     ) -> CommitOutcome:
         """Persist an exact-snapshot preview result without invoking the model again."""
-        raw_image, processed_image = self._render_images(word)
+        raw_image, processed_image = self.render_for_recognition(word)
+        if self.debug_dir is not None and source_word is not None:
+            source = self.debug_dir / source_word.word_id / "model_input.png"
+            destination = self.debug_dir / word.word_id / "model_input.png"
+            if source.is_file() and destination.parent.is_dir():
+                shutil.copyfile(source, destination)
         return self._finish(word, result, "", context, raw_image, processed_image, persist=True)
 
     def _recognize(
@@ -68,13 +75,16 @@ class HandwritingService:
     ) -> CommitOutcome:
         if not word.strokes or not any(stroke.points for stroke in word.strokes):
             raise ValueError("cannot recognize an empty word")
-        raw_image, processed_image = self._render_images(word)
+        raw_image, processed_image = self.render_for_recognition(word)
         result = self.recognizer.recognize(RecognitionSample(word, processed_image, context))
         return self._finish(
             word, result, terminator, context, raw_image, processed_image, persist=persist
         )
 
-    def _render_images(self, word: HandwrittenWord) -> tuple[Image.Image, Image.Image]:
+    def render_for_recognition(
+        self, word: HandwrittenWord
+    ) -> tuple[Image.Image, Image.Image]:
+        """Render the exact raw and processed images consumed by recognition."""
         if not word.strokes or not any(stroke.points for stroke in word.strokes):
             raise ValueError("cannot recognize an empty word")
         raw_image = self.renderer.render(word, filter_noise=False)
@@ -121,11 +131,11 @@ class HandwritingService:
         sample_dir = self.debug_dir / word.word_id
         sample_dir.mkdir(parents=True, exist_ok=True)
         raw_image.save(sample_dir / "raw_strokes.png")
-        raw_image.save(sample_dir / "raw.png")
         rendered_image.save(sample_dir / "rendered.png")
         processed_image.save(sample_dir / "processed.png")
         if word.recognition_metadata.get("input_mode") == "touchscreen":
-            self._save_touchscreen_geometry(sample_dir, word)
+            raw_image.save(sample_dir / "raw.png")
+            self._save_touchscreen_geometry(sample_dir, word, processed_image)
         (sample_dir / "preprocessing.json").write_text(
             json.dumps(
                 {
@@ -144,10 +154,39 @@ class HandwritingService:
         )
 
     @staticmethod
-    def _save_touchscreen_geometry(sample_dir: Path, word: HandwrittenWord) -> None:
+    def _save_touchscreen_geometry(
+        sample_dir: Path,
+        word: HandwrittenWord,
+        processed_image: Image.Image,
+    ) -> None:
+        capture_aspect = HandwritingService._aspect_ratio(
+            [
+                (point.x_raw, point.y_raw)
+                for stroke in word.strokes
+                for point in stroke.points
+            ]
+        )
+        display_aspect = HandwritingService._aspect_ratio(
+            [
+                (
+                    point.display_x if point.display_x is not None else point.x_raw,
+                    point.display_y if point.display_y is not None else point.y_raw,
+                )
+                for stroke in word.strokes
+                for point in stroke.points
+            ]
+        )
+        inverted = processed_image.point(lambda value: 255 - value)
+        rendered_bounds = inverted.getbbox()
+        rendered_aspect = None
+        if rendered_bounds is not None:
+            rendered_width = rendered_bounds[2] - rendered_bounds[0]
+            rendered_height = rendered_bounds[3] - rendered_bounds[1]
+            rendered_aspect = rendered_width / max(1, rendered_height)
         capture = {
             "word_id": word.word_id,
             "coordinate_space": "canvas-local Qt logical pixels",
+            "aspect_ratio": capture_aspect,
             "strokes": [
                 {
                     "stroke_id": stroke.stroke_id,
@@ -159,6 +198,7 @@ class HandwritingService:
         display = {
             "word_id": word.word_id,
             "coordinate_space": "whiteboard document logical pixels",
+            "aspect_ratio": display_aspect,
             "strokes": [
                 {
                     "stroke_id": stroke.stroke_id,
@@ -180,6 +220,8 @@ class HandwritingService:
         recognition = {
             "word_id": word.word_id,
             "coordinate_space": "undistorted canvas-local Qt logical pixels",
+            "aspect_ratio": capture_aspect,
+            "processed_ink_aspect_ratio": rendered_aspect,
             "strokes": [
                 {
                     "stroke_id": stroke.stroke_id,
@@ -198,6 +240,14 @@ class HandwritingService:
             (sample_dir / name).write_text(
                 json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"
             )
+
+    @staticmethod
+    def _aspect_ratio(points: list[tuple[float, float]]) -> float | None:
+        if not points:
+            return None
+        width = max(point[0] for point in points) - min(point[0] for point in points)
+        height = max(point[1] for point in points) - min(point[1] for point in points)
+        return width / max(height, 1e-6)
 
     def _processed_strokes(self, strokes: list[Stroke]) -> list[Stroke]:
         if self.smoother is None:

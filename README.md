@@ -79,8 +79,9 @@ uses deterministic beam search; random sampling is disabled.
 python -m touchwrite.app.main
 ```
 
-TouchWrite opens as a large, scrollable document whiteboard. Write on the active line using the
-touchpad or mouse. A temporary prediction appears after the configurable 500 ms idle debounce;
+TouchWrite opens as a large, scrollable document whiteboard. It auto-detects a Qt touchscreen when
+available and also offers explicit Touch Screen, Precision Touchpad, and Mouse modes. A temporary
+prediction appears after the configurable 500 ms idle debounce;
 only Space/two-finger tap or Enter commits text. Recognition runs on one background worker, so the
 next word can be written while an earlier commit is still resolving.
 
@@ -88,7 +89,7 @@ next word can be written while an earlier commit is still resolving.
 
 | Input | Action |
 |---|---|
-| Left mouse drag / one-finger pointer motion | Write a stroke |
+| Direct touchscreen contact / left mouse drag | Write a stroke directly under the pointer |
 | Two-finger tap where Windows maps it to right-click | Commit word and insert one space |
 | Right-click in canvas | Explicit fallback for commit + space |
 | Spacebar in mouse mode | Commit word and insert one space |
@@ -105,10 +106,11 @@ editor backed by the same structured document state.
 Settings use `TOUCHWRITE_` environment variables. Common examples:
 
 ```powershell
-$env:TOUCHWRITE_INPUT_MODE = "mouse"
 $env:TOUCHWRITE_MODEL_DEVICE = "cpu"
 $env:TOUCHWRITE_SMOOTHING_ENABLED = "true"
 $env:TOUCHWRITE_SAVE_SAMPLES = "true"
+$env:TOUCHWRITE_INPUT_MODE = "touchscreen"
+$env:TOUCHWRITE_AUTO_DETECT_INPUT = "true"
 $env:TOUCHWRITE_PREVIEW_DEBOUNCE_MS = "500"
 $env:TOUCHWRITE_AUTOSAVE_ENABLED = "true"
 $env:TOUCHWRITE_DEBUG_INPUT = "false"
@@ -122,6 +124,12 @@ The latest document is atomically autosaved to `data/documents/latest.json` and 
 next launch. Use **Export** for a plain-text copy. Streaming and accuracy measurements are shown
 under **Diagnostics**; the golden-sample result is documented in
 [`reports/whiteboard_regression.md`](reports/whiteboard_regression.md).
+
+**Diagnostics** opens the nine-target Touch Alignment Test. Enable
+`TOUCHWRITE_DEBUG_INPUT=true` to save touch coordinate/event logs plus capture, display,
+recognition, raw, processed, and model-input artifacts under `data/debug/touchscreen/`. Recognition
+lifecycle transitions are written to `recognition_timeline.jsonl`; individual pointer moves are not
+logged.
 
 ## Tests and lint
 
@@ -138,6 +146,18 @@ Run recognition directly against an image without the GUI:
 ```powershell
 python -m touchwrite.tools.test_recognition data\handwriting\<sample-id>\processed.png
 ```
+
+Replay one saved raw trajectory through the historical finalized-word, V2 commit, and V2 preview
+paths, or run the separately labeled touchscreen suite:
+
+```powershell
+python -m touchwrite.tools.replay_sample data\handwriting\<sample-id> --expected <label>
+python -m touchwrite.tools.regress_touchscreen
+python -m touchwrite.tools.regress_whiteboard
+```
+
+Replay artifacts and pixel-level comparisons are written under `reports/replay/` or
+`reports/touchscreen_replay/`; source sample directories are read-only.
 
 Enable `TOUCHWRITE_DEBUG_RECOGNITION=true` to save `raw_strokes.png`, `rendered.png`,
 `processed.png`, and the exact human-viewable `model_input.png` under

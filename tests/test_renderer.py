@@ -51,3 +51,36 @@ def test_noise_filter_preserves_near_dot_and_raw_trajectory() -> None:
     assert [stroke.stroke_id for stroke in filtered] == [1, 2]
     assert len(source) == 3
     assert len(source[-1].points) == 2
+
+
+def test_golden_processed_image_is_unchanged_when_local_fixture_exists() -> None:
+    from pathlib import Path
+
+    import pytest
+    from PIL import Image, ImageChops
+
+    from touchwrite.config.settings import Settings
+    from touchwrite.ink.smoother import MovingAverageSmoother
+    from touchwrite.persistence.session_store import SessionStore
+
+    sample_id = "ba216970-66de-4d3e-b192-7669dd273b86"
+    sample_dir = Path("data/handwriting") / sample_id
+    if not (sample_dir / "trajectory.json").is_file():
+        pytest.skip("local golden handwriting fixture is not installed")
+    settings = Settings()
+    word = SessionStore(settings.data_dir).load(sample_id)
+    smoother = MovingAverageSmoother(settings.smoothing_window)
+    processed_word = HandwrittenWord(
+        [smoother.smooth(item) for item in word.strokes],
+        word_id=word.word_id,
+        created_at=word.created_at,
+    )
+    actual = InkRenderer(
+        settings.render_width,
+        settings.render_height,
+        settings.render_padding,
+        settings.stroke_width,
+    ).render(processed_word, filter_noise=True)
+    with Image.open(sample_dir / "processed.png") as source_image:
+        expected = source_image.convert("L")
+    assert ImageChops.difference(actual, expected).getbbox() is None

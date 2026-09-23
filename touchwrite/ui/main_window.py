@@ -15,15 +15,18 @@ from PySide6.QtWidgets import (
     QInputDialog,
     QLabel,
     QMainWindow,
+    QMenu,
     QMessageBox,
     QScrollArea,
     QTextEdit,
     QToolBar,
+    QToolButton,
     QVBoxLayout,
     QWidget,
 )
 
 from touchwrite.config.settings import Settings
+from touchwrite.diagnostics.timeline import RecognitionTimeline
 from touchwrite.document.autosave import DocumentAutosave
 from touchwrite.document.models import WhiteboardDocument, WordSlot
 from touchwrite.ink.models import HandwrittenWord
@@ -76,17 +79,27 @@ class MainWindow(QMainWindow):
         self._cleared_words: list[HandwrittenWord] = []
         self._recognition_pending = False
         self._preview_scheduled_at = 0.0
-        self._active_input_mode = self._resolve_input_mode(settings.input_mode)
+        self._pending_commit_terminator: str | None = None
+        self._active_input_mode = self._resolve_input_mode(
+            settings.input_mode, settings.auto_detect_input
+        )
 
         self._stream_signals = _StreamSignals()
         self._stream_signals.preview_ready.connect(self._preview_ready)
         self._stream_signals.commit_ready.connect(self._commit_ready)
         self._stream_signals.failed.connect(self._recognition_failed)
+        timeline_path = (
+            settings.touchscreen_debug_dir / "recognition_timeline.jsonl"
+            if settings.debug_input or settings.debug_recognition
+            else None
+        )
+        self.recognition_timeline = RecognitionTimeline(timeline_path)
         self.stream = RecognitionStream(
             service,
             on_preview=self._stream_signals.preview_ready.emit,
             on_commit=self._stream_signals.commit_ready.emit,
             on_failure=self._stream_signals.failed.emit,
+            on_trace=self.recognition_timeline.record,
         )
 
         self.setWindowTitle("TouchWrite V2 — Live Whiteboard")
@@ -102,6 +115,7 @@ class MainWindow(QMainWindow):
         self.canvas.set_document(self.document)
         self.canvas.ink_changed.connect(self._ink_changed)
         self.canvas.stroke_started.connect(self._stroke_started)
+        self.canvas.stroke_ended.connect(self._stroke_ended)
         self.canvas.space_requested.connect(lambda: self._request_commit(" "))
         self.canvas.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
 
@@ -145,7 +159,7 @@ class MainWindow(QMainWindow):
             "QToolBar { background: #ffffff; border: 0; border-bottom: 1px solid #cbd5e1; "
             "spacing: 7px; padding: 5px 10px; color: #0f172a; }"
             "QToolButton { color: #0f172a; background: #ffffff; border: 1px solid #cbd5e1; "
-            "min-height: 42px; padding: 0 14px; border-radius: 8px; font-weight: 600; }"
+            "min-height: 42px; padding: 0 8px; border-radius: 8px; font-weight: 600; }"
             "QToolButton:hover { background: #eff6ff; border-color: #60a5fa; }"
             "QToolButton:pressed { background: #dbeafe; }"
             "QToolButton:disabled { color: #94a3b8; background: #f8fafc; }"
@@ -154,6 +168,10 @@ class MainWindow(QMainWindow):
             "QToolButton#primaryAction:pressed { background: #1d4ed8; }"
             "QComboBox { color: #0f172a; background: white; border: 1px solid #94a3b8; "
             "min-height: 42px; min-width: 155px; padding: 0 10px; border-radius: 8px; }"
+            "QMenu { color: #0f172a; background: white; border: 1px solid #94a3b8; }"
+            "QMenu::item { min-height: 40px; padding: 2px 18px; }"
+            "QMenu::item:selected { background: #dbeafe; }"
+            "QToolBar QLabel { color: #0f172a; }"
             "QLabel#brandLabel { color: #0f172a; font-size: 20px; font-weight: 700; }"
             "QLabel#modeLabel { color: #15803d; font-size: 14px; font-weight: 700; }"
             "QWidget#footer { background: white; border-top: 1px solid #e5e7eb; }"
@@ -177,6 +195,7 @@ class MainWindow(QMainWindow):
         self._update_mode_label()
         if self._active_input_mode == "touchpad":
             self._start_writing_mode()
+        QTimer.singleShot(0, lambda: self._update_toolbar_responsiveness(self.width()))
 
     def _build_toolbars(self) -> None:
         identity = QToolBar("Identity")
@@ -199,6 +218,16 @@ class MainWindow(QMainWindow):
         self.input_mode_combo.setCurrentIndex(max(0, index))
         self.input_mode_combo.currentIndexChanged.connect(self._input_mode_changed)
         identity.addWidget(self.input_mode_combo)
+        identity.addSeparator()
+        self._identity_optional_actions: list[QAction] = []
+        for label, callback in (
+            ("New Document", self._new_document),
+            ("Edit Text", self._edit_text),
+        ):
+            action = QAction(label, self)
+            action.triggered.connect(callback)
+            identity.addAction(action)
+            self._identity_optional_actions.append(action)
         self.addToolBar(identity)
 
         self.addToolBarBreak(Qt.ToolBarArea.TopToolBarArea)
@@ -217,20 +246,52 @@ class MainWindow(QMainWindow):
             ("Export", self._export_text),
             ("Settings", self._show_settings),
             ("Diagnostics", self._show_diagnostics),
-            ("New Document", self._new_document),
-            ("Edit Text", self._edit_text),
         )
+        self._secondary_toolbar_actions: list[QAction] = []
+        secondary_labels = {"Save", "Export", "Settings", "Diagnostics"}
         for label, callback in actions:
             action = QAction(label, self)
             action.setObjectName(label.lower().replace(" ", "_").replace("/", "_"))
             action.triggered.connect(callback)
             toolbar.addAction(action)
+            if label in secondary_labels:
+                self._secondary_toolbar_actions.append(action)
+        self.more_menu = QMenu(self)
+        overflow_callbacks = {
+            "Save": self._save_document,
+            "Export": self._export_text,
+            "Settings": self._show_settings,
+            "Diagnostics": self._show_diagnostics,
+            "New Document": self._new_document,
+            "Edit Text": self._edit_text,
+        }
+        for label, callback in overflow_callbacks.items():
+            menu_action = self.more_menu.addAction(label)
+            menu_action.triggered.connect(callback)
+        self.more_button = QToolButton()
+        self.more_button.setText("More")
+        self.more_button.setMenu(self.more_menu)
+        self.more_button.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
+        toolbar.addWidget(self.more_button)
         self.addToolBar(toolbar)
         for label in {"Commit / Space", "New Line"}:
             action = next(item for item in toolbar.actions() if item.text() == label)
             button = toolbar.widgetForAction(action)
             if button is not None:
                 button.setObjectName("primaryAction")
+
+    def resizeEvent(self, event: object) -> None:  # noqa: N802
+        super().resizeEvent(event)
+        self._update_toolbar_responsiveness(self.width())
+
+    def _update_toolbar_responsiveness(self, width: int) -> None:
+        wide = width >= 1050
+        for action in getattr(self, "_secondary_toolbar_actions", []):
+            action.setVisible(wide)
+        for action in getattr(self, "_identity_optional_actions", []):
+            action.setVisible(wide)
+        if hasattr(self, "more_button"):
+            self.more_button.setVisible(not wide)
 
     def keyPressEvent(self, event: QKeyEvent) -> None:  # noqa: N802
         modifiers = event.modifiers()
@@ -257,11 +318,35 @@ class MainWindow(QMainWindow):
             super().keyPressEvent(event)
 
     def _stroke_started(self) -> None:
+        existing_strokes = len(self.canvas.strokes)
+        self.recognition_timeline.record(
+            "stroke_started",
+            revision_id=self._revision_id + 1,
+            stroke_count=existing_strokes + 1,
+        )
+        if existing_strokes:
+            self.recognition_timeline.record(
+                "new_stroke_started",
+                revision_id=self._revision_id + 1,
+                stroke_count=existing_strokes + 1,
+            )
         self.preview_timer.stop()
         self.canvas.set_preview("")
         self._revision_id += 1
         self.stream.set_current_revision(self._revision_id)
         self.state_label.setText("Writing")
+
+    def _stroke_ended(self) -> None:
+        self.recognition_timeline.record(
+            "stroke_ended",
+            revision_id=self._revision_id,
+            stroke_count=len(self.canvas.strokes),
+        )
+        if self._pending_commit_terminator is None:
+            return
+        terminator = self._pending_commit_terminator
+        self._pending_commit_terminator = None
+        QTimer.singleShot(0, lambda: self._commit_complete_snapshot(terminator))
 
     def _ink_changed(self) -> None:
         self._revision_id += 1
@@ -273,6 +358,11 @@ class MainWindow(QMainWindow):
             return
         self._preview_scheduled_at = time.perf_counter()
         self.preview_timer.start()
+        self.recognition_timeline.record(
+            "preview_scheduled",
+            revision_id=self._revision_id,
+            debounce_ms=self.settings.preview_debounce_ms,
+        )
         self.state_label.setText("Writing")
 
     def _request_preview(self) -> None:
@@ -287,14 +377,48 @@ class MainWindow(QMainWindow):
         )
 
     def _request_commit(self, terminator: str) -> None:
+        self.recognition_timeline.record(
+            "commit_pressed",
+            revision_id=self._revision_id,
+            terminator=terminator,
+            active_input=self.canvas.input_active,
+        )
+        self.preview_timer.stop()
+        if self.canvas.input_active:
+            self._pending_commit_terminator = terminator
+            self.state_label.setText("Finishing stroke…")
+            return
+        self._commit_complete_snapshot(terminator)
+
+    def _commit_complete_snapshot(self, terminator: str) -> None:
         self.preview_timer.stop()
         if self.canvas.buffer.is_empty:
             if self.document.insert_terminator(terminator):
                 self._document_changed()
             return
 
-        self.canvas.buffer.finalize_active()
         word = self.canvas.snapshot()
+        snapshot_revision = self._revision_id
+        self._revision_id += 1
+        self.stream.cancel_pending_preview(self._revision_id)
+        screen = self.canvas.screen()
+        word.recognition_metadata.update(
+            {
+                "input_mode": self._active_input_mode,
+                "capture_coordinate_space": "canvas-local Qt logical pixels",
+                "display_coordinate_space": "whiteboard document logical pixels",
+                "recognition_coordinate_space": "undistorted canvas-local Qt logical pixels",
+                "canvas_size": [self.canvas.width(), self.canvas.height()],
+                "widget_device_pixel_ratio": self.canvas.devicePixelRatioF(),
+                "screen_device_pixel_ratio": (
+                    screen.devicePixelRatio() if screen is not None else 1.0
+                ),
+                "scroll_offset": [
+                    self.scroll_area.horizontalScrollBar().value(),
+                    self.scroll_area.verticalScrollBar().value(),
+                ],
+            }
+        )
         sequence = self._next_commit_sequence
         self._next_commit_sequence += 1
         context = self.document.to_plain_text()
@@ -305,7 +429,7 @@ class MainWindow(QMainWindow):
         self.canvas.clear_ink()
         self.stream.request_commit(
             word,
-            self._revision_id,
+            snapshot_revision,
             sequence,
             context=context,
             document_id=slot.document_id,
@@ -469,22 +593,32 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage("Document text updated")
 
     def _show_settings(self) -> None:
+        screen = self.canvas.screen()
         QMessageBox.information(
             self,
             "TouchWrite settings",
             f"Preview debounce: {self.settings.preview_debounce_ms} ms\n"
             f"Model: {self.settings.model_name}\n"
             f"Beams: {self.settings.beam_width}\n"
-            f"Processor use_fast: {self.settings.processor_use_fast}",
+            f"Processor use_fast: {self.settings.processor_use_fast}\n"
+            f"Input mode: {self._mode_display_name(self._active_input_mode)}\n"
+            f"Widget DPR: {self.canvas.devicePixelRatioF():.2f}\n"
+            f"Screen DPR: {screen.devicePixelRatio() if screen is not None else 1.0:.2f}",
         )
 
     def _show_diagnostics(self) -> None:
-        metrics = self.stream.snapshot_metrics()
-        lines = [
-            f"{name.replace('_', ' ').title()}: {value}"
-            for name, value in metrics.to_dict().items()
-        ]
-        QMessageBox.information(self, "Streaming diagnostics", "\n".join(lines))
+        dialog = TouchAlignmentDialog(
+            self.settings.touchscreen_debug_dir / "touch_alignment_latest.json",
+            self,
+        )
+        dialog.exec()
+        touch_metrics = dialog.canvas.metrics()
+        stream_metrics = self.stream.snapshot_metrics()
+        self.statusBar().showMessage(
+            f"Alignment samples: {touch_metrics['samples']} · "
+            f"cache reuses: {stream_metrics.cache_reuse_count} · "
+            f"stale previews: {stream_metrics.stale_preview_discard_count}"
+        )
 
     def _document_changed(self) -> None:
         self._sync_document_view()
@@ -517,11 +651,43 @@ class MainWindow(QMainWindow):
             f"Model: TrOCR · {outcome.result.inference_duration_ms:.0f} ms"
         )
 
-    def _toggle_writing_mode(self) -> None:
-        if self._touchpad_provider is None:
+    @staticmethod
+    def _resolve_input_mode(configured: str, auto_detect: bool = True) -> str:
+        if configured not in {"auto", "mouse"} or not auto_detect:
+            return configured
+        if any(
+            device.type() == QPointingDevice.DeviceType.TouchScreen
+            for device in QInputDevice.devices()
+        ):
+            return "touchscreen"
+        return "mouse"
+
+    @staticmethod
+    def _mode_display_name(mode: str) -> str:
+        return {
+            "touchscreen": "Touch Screen",
+            "touchpad": "Precision Touchpad",
+            "mouse": "Mouse",
+        }.get(mode, mode.title())
+
+    def _input_mode_changed(self, index: int) -> None:
+        mode = str(self.input_mode_combo.itemData(index))
+        if mode == self._active_input_mode:
+            return
+        self._stop_writing_mode()
+        self._active_input_mode = mode
+        self.canvas.set_input_mode(mode)
+        if mode == "touchpad":
             self._start_writing_mode()
-        else:
-            self._stop_writing_mode()
+        self._update_mode_label()
+        self.canvas.setFocus()
+
+    def _update_mode_label(self) -> None:
+        self.mode_label.setText(f"● {self._mode_display_name(self._active_input_mode)}")
+
+    def _toggle_writing_mode(self) -> None:
+        next_mode = "mouse" if self._active_input_mode == "touchpad" else "touchpad"
+        self.input_mode_combo.setCurrentIndex(self.input_mode_combo.findData(next_mode))
 
     def _start_writing_mode(self) -> None:
         if self._touchpad_provider is not None:
@@ -530,6 +696,12 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage(
                 "Native touchpad APIs unavailable; mouse fallback remains active"
             )
+            self._active_input_mode = "mouse"
+            self.canvas.set_input_mode("mouse")
+            self.input_mode_combo.blockSignals(True)
+            self.input_mode_combo.setCurrentIndex(self.input_mode_combo.findData("mouse"))
+            self.input_mode_combo.blockSignals(False)
+            self._update_mode_label()
             return
         engine = GestureEngine(
             self.settings.two_finger_tap_max_ms,
@@ -550,8 +722,8 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage(f"Could not start native touchpad input: {error}")
             return
         self._touchpad_provider = provider
-        self.mode_label.setText("Writing Mode ●")
-        self.statusBar().showMessage("Writing mode active — two-finger tap commits")
+        self._update_mode_label()
+        self.statusBar().showMessage("Precision Touchpad active — two-finger tap commits")
 
     def _stop_writing_mode(self) -> None:
         provider, self._touchpad_provider = self._touchpad_provider, None
@@ -560,7 +732,7 @@ class MainWindow(QMainWindow):
             application = QCoreApplication.instance()
             if application is not None:
                 application.removeNativeEventFilter(provider)
-        self.mode_label.setText("Mouse Mode ●")
+        self._update_mode_label()
 
     def _native_gesture(self, action: GestureAction) -> None:
         if action is GestureAction.SPACE:

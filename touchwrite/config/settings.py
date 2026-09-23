@@ -16,7 +16,8 @@ def _env_bool(name: str, default: bool) -> bool:
 
 @dataclass(frozen=True, slots=True)
 class Settings:
-    input_mode: str = "auto"
+    input_mode: str = "mouse"
+    auto_detect_input: bool = True
     smoothing_enabled: bool = True
     smoothing_window: int = 3
     two_finger_tap_max_ms: int = 220
@@ -74,6 +75,7 @@ class Settings:
             "debug_input",
             "debug_recognition",
             "autosave_enabled",
+            "auto_detect_input",
         }
         int_names = {
             "smoothing_window",

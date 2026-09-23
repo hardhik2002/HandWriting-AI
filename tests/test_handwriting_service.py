@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 import pytest
 from PIL import Image
 
@@ -64,3 +66,28 @@ def test_debug_mode_saves_pre_model_artifacts(tmp_path) -> None:
         "processed.png",
         "preprocessing.json",
     }
+
+
+def test_touchscreen_debug_saves_separate_coordinate_spaces(tmp_path) -> None:
+    debug_dir = tmp_path / "touchscreen"
+    word = HandwrittenWord([stroke()])
+    word.recognition_metadata["input_mode"] = "touchscreen"
+    service = HandwritingService(
+        FakeRecognizer(), InkRenderer(), None, debug_dir=debug_dir
+    )
+    service.commit(word, " ")
+    sample_dir = debug_dir / word.word_id
+    assert {
+        "capture.json",
+        "display.json",
+        "recognition.json",
+        "raw.png",
+        "processed.png",
+    } <= {path.name for path in sample_dir.iterdir()}
+    capture = json.loads((sample_dir / "capture.json").read_text(encoding="utf-8"))
+    display = json.loads((sample_dir / "display.json").read_text(encoding="utf-8"))
+    recognition = json.loads(
+        (sample_dir / "recognition.json").read_text(encoding="utf-8")
+    )
+    assert capture["aspect_ratio"] == display["aspect_ratio"]
+    assert recognition["aspect_ratio"] == capture["aspect_ratio"]

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import threading
 import time
+from dataclasses import replace
 
 from touchwrite.ink.models import HandwrittenWord, Point, Stroke
 from touchwrite.recognition.base import RecognitionResult
@@ -31,6 +32,8 @@ class FakeStreamingService:
         self.started = threading.Event()
         self.release = threading.Event()
         self.block_first_preview = False
+        self.preview_words: list[HandwrittenWord] = []
+        self.commit_words: list[HandwrittenWord] = []
 
     @staticmethod
     def _outcome(value: HandwrittenWord, text: str = "ink") -> CommitOutcome:
@@ -39,6 +42,7 @@ class FakeStreamingService:
 
     def preview(self, value: HandwrittenWord, context: str = "") -> CommitOutcome:
         self.preview_calls += 1
+        self.preview_words.append(value)
         if self.block_first_preview and self.preview_calls == 1:
             self.started.set()
             self.release.wait(timeout=2)
@@ -48,6 +52,7 @@ class FakeStreamingService:
         self, value: HandwrittenWord, terminator: str, context: str = ""
     ) -> CommitOutcome:
         self.commit_calls += 1
+        self.commit_words.append(value)
         return self._outcome(value)
 
     def commit_cached(
@@ -55,6 +60,7 @@ class FakeStreamingService:
         value: HandwrittenWord,
         result: RecognitionResult,
         context: str = "",
+        source_word: HandwrittenWord | None = None,
     ) -> CommitOutcome:
         self.cached_calls += 1
         return CommitOutcome(value, result, result.text, None)
@@ -85,6 +91,15 @@ def test_snapshot_hash_is_stable_and_changes_with_trajectory() -> None:
     same_trajectory = HandwrittenWord(original.strokes)
     assert trajectory_hash(original) == trajectory_hash(same_trajectory)
     assert trajectory_hash(original) != trajectory_hash(word(1.0))
+
+
+def test_snapshot_hash_ignores_display_only_coordinates() -> None:
+    original = word()
+    points = original.strokes[0].points
+    visually_moved = HandwrittenWord(
+        [Stroke(1, [replace(points[0], display_x=999, display_y=777), points[1]])]
+    )
+    assert trajectory_hash(original) == trajectory_hash(visually_moved)
 
 
 def test_preview_cache_reused_only_for_exact_commit_snapshot() -> None:
@@ -127,4 +142,71 @@ def test_latest_pending_preview_wins_and_stale_result_is_discarded() -> None:
         assert stream.snapshot_metrics().stale_preview_discard_count == 1
     finally:
         service.release.set()
+        stream.shutdown(wait=True)
+
+
+def test_same_hash_from_different_revision_cannot_reuse_preview() -> None:
+    service = FakeStreamingService()
+    commits = []
+    stream = RecognitionStream(service, on_commit=commits.append)
+    try:
+        stream.request_preview(word(), 1)
+        wait_for(lambda: service.preview_calls == 1)
+        request_commit(stream, word(), 2)
+        wait_for(lambda: len(commits) == 1)
+        assert not commits[0].cache_reused
+        assert service.commit_calls == 1
+    finally:
+        stream.shutdown(wait=True)
+
+
+def test_preview_before_i_dot_cannot_be_reused_after_dot() -> None:
+    service = FakeStreamingService()
+    commits = []
+    stream = RecognitionStream(service, on_commit=commits.append)
+    body = word()
+    dot = Stroke(2, [Point(0.5, 0.1, 3, 50, 10), Point(0.5, 0.1, 4, 50, 10)])
+    complete = HandwrittenWord([*body.strokes, dot])
+    try:
+        stream.request_preview(body, 1)
+        wait_for(lambda: service.preview_calls == 1)
+        request_commit(stream, complete, 2)
+        wait_for(lambda: len(commits) == 1)
+        assert trajectory_hash(body) != trajectory_hash(complete)
+        assert not commits[0].cache_reused
+        assert len(service.commit_words[0].strokes) == 2
+    finally:
+        stream.shutdown(wait=True)
+
+
+def test_queued_request_uses_immutable_defensive_snapshot() -> None:
+    service = FakeStreamingService()
+    service.block_first_preview = True
+    stream = RecognitionStream(service)
+    value = word()
+    try:
+        stream.request_preview(value, 1)
+        assert service.started.wait(timeout=1)
+        value.strokes.append(Stroke(2, [Point(0.1, 0.1, 3, 1, 1)]))
+        service.release.set()
+        wait_for(lambda: service.preview_calls == 1)
+        assert len(service.preview_words[0].strokes) == 1
+    finally:
+        service.release.set()
+        stream.shutdown(wait=True)
+
+
+def test_rapid_commits_preserve_sequence_and_word_boundaries() -> None:
+    service = FakeStreamingService()
+    commits = []
+    stream = RecognitionStream(service, on_commit=commits.append)
+    try:
+        request_commit(stream, word(), 1)
+        request_commit(stream, word(10.0), 2)
+        wait_for(lambda: len(commits) == 2)
+        assert [event.request.commit_sequence_id for event in commits] == [1, 2]
+        assert trajectory_hash(commits[0].request.word) != trajectory_hash(
+            commits[1].request.word
+        )
+    finally:
         stream.shutdown(wait=True)
