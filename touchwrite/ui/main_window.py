@@ -7,8 +7,9 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from PySide6.QtCore import QCoreApplication, QObject, Qt, QTimer, Signal
-from PySide6.QtGui import QAction, QKeyEvent
+from PySide6.QtGui import QAction, QGuiApplication, QInputDevice, QKeyEvent, QPointingDevice
 from PySide6.QtWidgets import (
+    QComboBox,
     QFileDialog,
     QHBoxLayout,
     QInputDialog,
@@ -39,6 +40,7 @@ from touchwrite.services.recognition_stream import (
     RecognitionStream,
 )
 from touchwrite.ui.ink_canvas import InkCanvas
+from touchwrite.ui.touch_alignment import TouchAlignmentDialog
 
 
 class _StreamSignals(QObject):
@@ -74,6 +76,7 @@ class MainWindow(QMainWindow):
         self._cleared_words: list[HandwrittenWord] = []
         self._recognition_pending = False
         self._preview_scheduled_at = 0.0
+        self._active_input_mode = self._resolve_input_mode(settings.input_mode)
 
         self._stream_signals = _StreamSignals()
         self._stream_signals.preview_ready.connect(self._preview_ready)
@@ -87,10 +90,15 @@ class MainWindow(QMainWindow):
         )
 
         self.setWindowTitle("TouchWrite V2 — Live Whiteboard")
-        self.resize(1180, 820)
-        self.setMinimumSize(820, 600)
+        screen = QGuiApplication.primaryScreen()
+        available = screen.availableGeometry() if screen is not None else None
+        width = min(1180, available.width() - 32) if available is not None else 1180
+        height = min(760, available.height() - 32) if available is not None else 760
+        self.resize(max(760, width), max(560, height))
+        self.setMinimumSize(760, 560)
 
         self.canvas = InkCanvas(settings)
+        self.canvas.set_input_mode(self._active_input_mode)
         self.canvas.set_document(self.document)
         self.canvas.ink_changed.connect(self._ink_changed)
         self.canvas.stroke_started.connect(self._stroke_started)
@@ -109,8 +117,8 @@ class MainWindow(QMainWindow):
 
         self.prediction_label = QLabel("Prediction: —")
         self.confidence_label = QLabel("Model: TrOCR")
-        self.mode_label = QLabel("Writing Mode ●")
-        self.mode_label.setStyleSheet("color: #15803d; font-weight: 600;")
+        self.mode_label = QLabel()
+        self.mode_label.setObjectName("modeLabel")
         self.state_label = QLabel("Ready")
 
         footer = QWidget()
@@ -131,13 +139,23 @@ class MainWindow(QMainWindow):
         layout.addWidget(footer)
         layout.addWidget(self.editor)
         self.setCentralWidget(central)
-        self._build_toolbar()
+        self._build_toolbars()
         self.setStyleSheet(
             "QMainWindow { background: #f3f4f6; }"
-            "QToolBar { background: white; border: 0; border-bottom: 1px solid #e5e7eb; "
-            "spacing: 6px; padding: 8px; }"
-            "QToolButton { padding: 7px 10px; border-radius: 6px; }"
-            "QToolButton:hover { background: #eff6ff; }"
+            "QToolBar { background: #ffffff; border: 0; border-bottom: 1px solid #cbd5e1; "
+            "spacing: 7px; padding: 5px 10px; color: #0f172a; }"
+            "QToolButton { color: #0f172a; background: #ffffff; border: 1px solid #cbd5e1; "
+            "min-height: 42px; padding: 0 14px; border-radius: 8px; font-weight: 600; }"
+            "QToolButton:hover { background: #eff6ff; border-color: #60a5fa; }"
+            "QToolButton:pressed { background: #dbeafe; }"
+            "QToolButton:disabled { color: #94a3b8; background: #f8fafc; }"
+            "QToolButton#primaryAction { color: white; background: #2563eb; "
+            "border-color: #1d4ed8; }"
+            "QToolButton#primaryAction:pressed { background: #1d4ed8; }"
+            "QComboBox { color: #0f172a; background: white; border: 1px solid #94a3b8; "
+            "min-height: 42px; min-width: 155px; padding: 0 10px; border-radius: 8px; }"
+            "QLabel#brandLabel { color: #0f172a; font-size: 20px; font-weight: 700; }"
+            "QLabel#modeLabel { color: #15803d; font-size: 14px; font-weight: 700; }"
             "QWidget#footer { background: white; border-top: 1px solid #e5e7eb; }"
         )
 
@@ -156,36 +174,63 @@ class MainWindow(QMainWindow):
             "Ready — write with one finger; two-finger tap/right-click commits"
         )
         self.canvas.setFocus()
-        if settings.input_mode == "touchpad":
+        self._update_mode_label()
+        if self._active_input_mode == "touchpad":
             self._start_writing_mode()
 
-    def _build_toolbar(self) -> None:
-        toolbar = QToolBar("Whiteboard")
+    def _build_toolbars(self) -> None:
+        identity = QToolBar("Identity")
+        identity.setObjectName("identityToolbar")
+        identity.setMovable(False)
+        identity.setFloatable(False)
+        identity.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextOnly)
+        brand = QLabel("TouchWrite")
+        brand.setObjectName("brandLabel")
+        identity.addWidget(brand)
+        identity.addSeparator()
+        identity.addWidget(self.mode_label)
+        identity.addSeparator()
+        identity.addWidget(QLabel("Input:"))
+        self.input_mode_combo = QComboBox()
+        self.input_mode_combo.addItem("Touch Screen", "touchscreen")
+        self.input_mode_combo.addItem("Precision Touchpad", "touchpad")
+        self.input_mode_combo.addItem("Mouse", "mouse")
+        index = self.input_mode_combo.findData(self._active_input_mode)
+        self.input_mode_combo.setCurrentIndex(max(0, index))
+        self.input_mode_combo.currentIndexChanged.connect(self._input_mode_changed)
+        identity.addWidget(self.input_mode_combo)
+        self.addToolBar(identity)
+
+        self.addToolBarBreak(Qt.ToolBarArea.TopToolBarArea)
+        toolbar = QToolBar("Actions")
+        toolbar.setObjectName("actionsToolbar")
         toolbar.setMovable(False)
-        toolbar.addWidget(QLabel("  TouchWrite  "))
-        toolbar.addSeparator()
-        toolbar.addWidget(self.mode_label)
-        toolbar.addSeparator()
+        toolbar.setFloatable(False)
+        toolbar.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextOnly)
         actions = (
             ("Undo", self._undo),
             ("Redo", self._redo),
-            ("Clear Current Ink", self._clear_ink),
-            ("New Document", self._new_document),
+            ("Clear Ink", self._clear_ink),
+            ("Commit / Space", lambda: self._request_commit(" ")),
+            ("New Line", lambda: self._request_commit("\n")),
             ("Save", self._save_document),
-            ("Edit Text", self._edit_text),
             ("Export", self._export_text),
             ("Settings", self._show_settings),
             ("Diagnostics", self._show_diagnostics),
+            ("New Document", self._new_document),
+            ("Edit Text", self._edit_text),
         )
         for label, callback in actions:
             action = QAction(label, self)
+            action.setObjectName(label.lower().replace(" ", "_").replace("/", "_"))
             action.triggered.connect(callback)
             toolbar.addAction(action)
-        toolbar.addSeparator()
-        self.mode_action = QAction("Toggle Writing Mode", self)
-        self.mode_action.triggered.connect(self._toggle_writing_mode)
-        toolbar.addAction(self.mode_action)
         self.addToolBar(toolbar)
+        for label in {"Commit / Space", "New Line"}:
+            action = next(item for item in toolbar.actions() if item.text() == label)
+            button = toolbar.widgetForAction(action)
+            if button is not None:
+                button.setObjectName("primaryAction")
 
     def keyPressEvent(self, event: QKeyEvent) -> None:  # noqa: N802
         modifiers = event.modifiers()
