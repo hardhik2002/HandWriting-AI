@@ -42,6 +42,39 @@ class HandwritingService:
         self.debug_dir = debug_dir
 
     def commit(self, word: HandwrittenWord, terminator: str, context: str = "") -> CommitOutcome:
+        return self._recognize(word, terminator, context, persist=True)
+
+    def preview(self, word: HandwrittenWord, context: str = "") -> CommitOutcome:
+        """Recognize through the authoritative pipeline without persisting the sample."""
+        return self._recognize(word, "", context, persist=False)
+
+    def commit_cached(
+        self,
+        word: HandwrittenWord,
+        result: RecognitionResult,
+        context: str = "",
+    ) -> CommitOutcome:
+        """Persist an exact-snapshot preview result without invoking the model again."""
+        raw_image, processed_image = self._render_images(word)
+        return self._finish(word, result, "", context, raw_image, processed_image, persist=True)
+
+    def _recognize(
+        self,
+        word: HandwrittenWord,
+        terminator: str,
+        context: str,
+        *,
+        persist: bool,
+    ) -> CommitOutcome:
+        if not word.strokes or not any(stroke.points for stroke in word.strokes):
+            raise ValueError("cannot recognize an empty word")
+        raw_image, processed_image = self._render_images(word)
+        result = self.recognizer.recognize(RecognitionSample(word, processed_image, context))
+        return self._finish(
+            word, result, terminator, context, raw_image, processed_image, persist=persist
+        )
+
+    def _render_images(self, word: HandwrittenWord) -> tuple[Image.Image, Image.Image]:
         if not word.strokes or not any(stroke.points for stroke in word.strokes):
             raise ValueError("cannot recognize an empty word")
         raw_image = self.renderer.render(word, filter_noise=False)
@@ -54,14 +87,26 @@ class HandwritingService:
         processed_image = self.renderer.render(processed_word, filter_noise=True)
         if self.debug_dir is not None:
             self._save_debug_artifacts(word, raw_image, rendered_image, processed_image)
-        result = self.recognizer.recognize(RecognitionSample(word, processed_image, context))
+        return raw_image, processed_image
+
+    def _finish(
+        self,
+        word: HandwrittenWord,
+        result: RecognitionResult,
+        terminator: str,
+        context: str,
+        raw_image: Image.Image,
+        processed_image: Image.Image,
+        *,
+        persist: bool,
+    ) -> CommitOutcome:
         final_text = self.postprocessor.process(result.text, context)
         word.raw_prediction = result.raw_text or result.text
         word.predicted_text = final_text
         word.confidence = result.confidence
         word.model_name = result.model_name
         sample_id = None
-        if self.store is not None:
+        if persist and self.store is not None:
             self.store.save(word, raw_image, processed_image)
             sample_id = word.word_id
         return CommitOutcome(word, result, final_text + terminator, sample_id)

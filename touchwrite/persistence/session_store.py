@@ -37,6 +37,11 @@ class SessionStore:
             "corrected_text": word.expected_text,
             "confidence": word.confidence,
             "model_name": word.model_name,
+            "document_id": word.document_id,
+            "line_index": word.line_index,
+            "word_index": word.word_index,
+            "commit_sequence_id": word.commit_sequence_id,
+            "recognition_metadata": word.recognition_metadata,
         }
         self._write_json_atomic(sample_dir / "metadata.json", metadata)
         raw_image.save(sample_dir / "raw.png")

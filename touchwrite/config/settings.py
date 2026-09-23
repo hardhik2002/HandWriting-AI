@@ -32,10 +32,14 @@ class Settings:
     beam_width: int = 8
     max_new_tokens: int = 24
     processor_use_fast: bool = False
+    preview_debounce_ms: int = 500
+    autosave_interval_ms: int = 1500
+    autosave_enabled: bool = True
     save_samples: bool = True
     debug_input: bool = False
     debug_recognition: bool = False
     data_dir: Path = Path("data/handwriting")
+    autosave_path: Path = Path("data/documents/latest.json")
     debug_recognition_dir: Path = Path("data/debug/recognition")
     log_level: str = "INFO"
 
@@ -52,6 +56,8 @@ class Settings:
             raise ValueError("render padding must leave a non-empty drawing region")
         if self.beam_width < 1 or self.max_new_tokens < 1:
             raise ValueError("generation limits must be positive")
+        if self.preview_debounce_ms < 0 or self.autosave_interval_ms < 1:
+            raise ValueError("preview and autosave timing values must not be negative")
 
     @classmethod
     def from_environment(cls) -> Settings:
@@ -63,6 +69,7 @@ class Settings:
             "save_samples",
             "debug_input",
             "debug_recognition",
+            "autosave_enabled",
         }
         int_names = {
             "smoothing_window",
@@ -75,6 +82,8 @@ class Settings:
             "stroke_width",
             "beam_width",
             "max_new_tokens",
+            "preview_debounce_ms",
+            "autosave_interval_ms",
         }
         float_names = {"two_finger_max_travel"}
         for field in fields(cls):
@@ -88,7 +97,7 @@ class Settings:
                 values[field.name] = int(raw)
             elif field.name in float_names:
                 values[field.name] = float(raw)
-            elif field.name in {"data_dir", "debug_recognition_dir"}:
+            elif field.name in {"data_dir", "debug_recognition_dir", "autosave_path"}:
                 values[field.name] = Path(raw)
             else:
                 values[field.name] = raw

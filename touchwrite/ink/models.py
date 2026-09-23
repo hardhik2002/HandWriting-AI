@@ -54,6 +54,11 @@ class HandwrittenWord:
     raw_prediction: str | None = None
     confidence: float | None = None
     model_name: str | None = None
+    document_id: str | None = None
+    line_index: int | None = None
+    word_index: int | None = None
+    commit_sequence_id: int | None = None
+    recognition_metadata: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -73,4 +78,3 @@ class HandwrittenWord:
             if key in cls.__dataclass_fields__ and key != "strokes"
         }
         return cls(strokes=strokes, **known)
-
