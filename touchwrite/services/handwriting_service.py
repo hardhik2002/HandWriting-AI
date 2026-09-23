@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from pathlib import Path
 
 from PIL import Image
@@ -121,8 +121,11 @@ class HandwritingService:
         sample_dir = self.debug_dir / word.word_id
         sample_dir.mkdir(parents=True, exist_ok=True)
         raw_image.save(sample_dir / "raw_strokes.png")
+        raw_image.save(sample_dir / "raw.png")
         rendered_image.save(sample_dir / "rendered.png")
         processed_image.save(sample_dir / "processed.png")
+        if word.recognition_metadata.get("input_mode") == "touchscreen":
+            self._save_touchscreen_geometry(sample_dir, word)
         (sample_dir / "preprocessing.json").write_text(
             json.dumps(
                 {
@@ -139,6 +142,62 @@ class HandwritingService:
             ),
             encoding="utf-8",
         )
+
+    @staticmethod
+    def _save_touchscreen_geometry(sample_dir: Path, word: HandwrittenWord) -> None:
+        capture = {
+            "word_id": word.word_id,
+            "coordinate_space": "canvas-local Qt logical pixels",
+            "strokes": [
+                {
+                    "stroke_id": stroke.stroke_id,
+                    "points": [asdict(point) for point in stroke.points],
+                }
+                for stroke in word.strokes
+            ],
+        }
+        display = {
+            "word_id": word.word_id,
+            "coordinate_space": "whiteboard document logical pixels",
+            "strokes": [
+                {
+                    "stroke_id": stroke.stroke_id,
+                    "points": [
+                        {
+                            "x": point.display_x
+                            if point.display_x is not None
+                            else point.x_raw,
+                            "y": point.display_y
+                            if point.display_y is not None
+                            else point.y_raw,
+                        }
+                        for point in stroke.points
+                    ],
+                }
+                for stroke in word.strokes
+            ],
+        }
+        recognition = {
+            "word_id": word.word_id,
+            "coordinate_space": "undistorted canvas-local Qt logical pixels",
+            "strokes": [
+                {
+                    "stroke_id": stroke.stroke_id,
+                    "points": [
+                        {"x": point.x_raw, "y": point.y_raw} for point in stroke.points
+                    ],
+                }
+                for stroke in word.strokes
+            ],
+        }
+        for name, payload in (
+            ("capture.json", capture),
+            ("display.json", display),
+            ("recognition.json", recognition),
+        ):
+            (sample_dir / name).write_text(
+                json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"
+            )
 
     def _processed_strokes(self, strokes: list[Stroke]) -> list[Stroke]:
         if self.smoother is None:

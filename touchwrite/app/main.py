@@ -27,7 +27,11 @@ def main() -> int:
         settings.render_padding,
         settings.stroke_width,
     )
-    debug_dir = settings.debug_recognition_dir if settings.debug_recognition else None
+    debug_dir = None
+    if settings.debug_input:
+        debug_dir = settings.touchscreen_debug_dir
+    elif settings.debug_recognition:
+        debug_dir = settings.debug_recognition_dir
     recognizer = ImageHandwritingRecognizer(
         settings.model_name,
         settings.model_device,

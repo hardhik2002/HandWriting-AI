@@ -21,6 +21,8 @@ class Point:
     dx: float = 0.0
     dy: float = 0.0
     velocity: float = 0.0
+    display_x: float | None = None
+    display_y: float | None = None
 
     def __post_init__(self) -> None:
         if not 0.0 <= self.x <= 1.0 or not 0.0 <= self.y <= 1.0:

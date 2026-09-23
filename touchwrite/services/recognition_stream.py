@@ -16,11 +16,26 @@ from touchwrite.services.handwriting_service import CommitOutcome, HandwritingSe
 
 
 def trajectory_hash(word: HandwrittenWord) -> str:
-    """Hash only trajectory content, excluding mutable recognition and identity fields."""
+    """Hash recognition trajectory content, excluding display-only coordinates."""
     trajectory = [
         {
             "stroke_id": stroke.stroke_id,
-            "points": [asdict(point) for point in stroke.points],
+            "points": [
+                {
+                    "x": point.x,
+                    "y": point.y,
+                    "timestamp_ns": point.timestamp_ns,
+                    "x_raw": point.x_raw,
+                    "y_raw": point.y_raw,
+                    "pressure": point.pressure,
+                    "contact_id": point.contact_id,
+                    "finger_down": point.finger_down,
+                    "dx": point.dx,
+                    "dy": point.dy,
+                    "velocity": point.velocity,
+                }
+                for point in stroke.points
+            ],
         }
         for stroke in word.strokes
     ]
@@ -248,6 +263,7 @@ class RecognitionStream:
         request.word.word_index = request.word_index
         request.word.commit_sequence_id = request.commit_sequence_id
         request.word.recognition_metadata = {
+            **request.word.recognition_metadata,
             "trajectory_hash": request.fingerprint,
             "revision_id": request.revision_id,
         }

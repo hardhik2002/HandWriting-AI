@@ -16,7 +16,7 @@ def _env_bool(name: str, default: bool) -> bool:
 
 @dataclass(frozen=True, slots=True)
 class Settings:
-    input_mode: str = "mouse"
+    input_mode: str = "auto"
     smoothing_enabled: bool = True
     smoothing_window: int = 3
     two_finger_tap_max_ms: int = 220
@@ -27,6 +27,7 @@ class Settings:
     render_height: int = 128
     render_padding: int = 16
     stroke_width: int = 8
+    visual_stroke_width: int = 4
     model_name: str = "microsoft/trocr-base-handwritten"
     model_device: str = "auto"
     beam_width: int = 8
@@ -41,11 +42,12 @@ class Settings:
     data_dir: Path = Path("data/handwriting")
     autosave_path: Path = Path("data/documents/latest.json")
     debug_recognition_dir: Path = Path("data/debug/recognition")
+    touchscreen_debug_dir: Path = Path("data/debug/touchscreen")
     log_level: str = "INFO"
 
     def __post_init__(self) -> None:
-        if self.input_mode not in {"mouse", "touchpad"}:
-            raise ValueError("input_mode must be 'mouse' or 'touchpad'")
+        if self.input_mode not in {"auto", "mouse", "touchpad", "touchscreen"}:
+            raise ValueError("input_mode must be auto, mouse, touchpad, or touchscreen")
         if self.smoothing_window < 1 or self.smoothing_window % 2 == 0:
             raise ValueError("smoothing_window must be a positive odd number")
         if self.render_width <= 0 or self.render_height <= 0:
@@ -56,6 +58,8 @@ class Settings:
             raise ValueError("render padding must leave a non-empty drawing region")
         if self.beam_width < 1 or self.max_new_tokens < 1:
             raise ValueError("generation limits must be positive")
+        if self.visual_stroke_width < 1:
+            raise ValueError("visual_stroke_width must be positive")
         if self.preview_debounce_ms < 0 or self.autosave_interval_ms < 1:
             raise ValueError("preview and autosave timing values must not be negative")
 
@@ -80,6 +84,7 @@ class Settings:
             "render_height",
             "render_padding",
             "stroke_width",
+            "visual_stroke_width",
             "beam_width",
             "max_new_tokens",
             "preview_debounce_ms",
@@ -97,7 +102,12 @@ class Settings:
                 values[field.name] = int(raw)
             elif field.name in float_names:
                 values[field.name] = float(raw)
-            elif field.name in {"data_dir", "debug_recognition_dir", "autosave_path"}:
+            elif field.name in {
+                "data_dir",
+                "debug_recognition_dir",
+                "touchscreen_debug_dir",
+                "autosave_path",
+            }:
                 values[field.name] = Path(raw)
             else:
                 values[field.name] = raw

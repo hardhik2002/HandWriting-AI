@@ -30,5 +30,6 @@ class MouseInputProvider:
             timestamp_ns=timestamp_ns if timestamp_ns is not None else time.monotonic_ns(),
             contact_id=0,
             finger_down=finger_down,
+            display_x=x_raw,
+            display_y=y_raw,
         )
-
