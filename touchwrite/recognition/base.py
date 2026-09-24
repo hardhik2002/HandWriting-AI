@@ -38,6 +38,7 @@ class RecognitionResult:
     device: str | None = None
     processor_mode: str | None = None
     generation_settings: dict[str, object] = field(default_factory=dict)
+    sequence_score: float | None = None
 
 
 class RecognitionError(RuntimeError):

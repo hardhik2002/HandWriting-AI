@@ -27,7 +27,7 @@ class Settings:
     render_width: int = 512
     render_height: int = 128
     render_padding: int = 16
-    stroke_width: int = 8
+    stroke_width: int = 6
     visual_stroke_width: int = 4
     model_name: str = "microsoft/trocr-base-handwritten"
     model_device: str = "auto"

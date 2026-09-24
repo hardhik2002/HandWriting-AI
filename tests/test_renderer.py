@@ -79,7 +79,7 @@ def test_golden_processed_image_is_unchanged_when_local_fixture_exists() -> None
         settings.render_width,
         settings.render_height,
         settings.render_padding,
-        settings.stroke_width,
+        8,
     ).render(processed_word, filter_noise=True)
     with Image.open(sample_dir / "processed.png") as source_image:
         expected = source_image.convert("L")

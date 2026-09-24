@@ -113,14 +113,28 @@ class ImageHandwritingRecognizer(HandwritingRecognizer):
             }
             generation_started = time.perf_counter()
             with torch.inference_mode():
-                sequences = self._model.generate(
+                generation = self._model.generate(
                     pixel_values,
+                    return_dict_in_generate=True,
+                    output_scores=True,
                     **generation_settings,
                 )
+            sequences = generation.sequences
             generation_duration = (time.perf_counter() - generation_started) * 1000
             decoding_started = time.perf_counter()
             decoded = self._processor.batch_decode(sequences, skip_special_tokens=True)
-            unique = tuple(dict.fromkeys(text.strip() for text in decoded if text.strip()))
+            sequence_scores = getattr(generation, "sequences_scores", None)
+            candidate_scores: dict[str, float | None] = {}
+            for index, decoded_text in enumerate(decoded):
+                text = decoded_text.strip()
+                if not text or text in candidate_scores:
+                    continue
+                candidate_scores[text] = (
+                    float(sequence_scores[index].item())
+                    if sequence_scores is not None
+                    else None
+                )
+            unique = tuple(candidate_scores)
             decoding_duration = (time.perf_counter() - decoding_started) * 1000
             if not unique:
                 raise RecognitionError("model returned no text")
@@ -143,7 +157,9 @@ class ImageHandwritingRecognizer(HandwritingRecognizer):
                 model_name=self.model_name,
                 inference_duration_ms=duration,
                 alternatives=tuple(
-                    RecognitionCandidate(text) for text in unique if text != selected
+                    RecognitionCandidate(text, candidate_scores[text])
+                    for text in unique
+                    if text != selected
                 ),
                 model_load_duration_ms=self._model_load_duration_ms,
                 processing_duration_ms=processing_duration,
@@ -152,6 +168,7 @@ class ImageHandwritingRecognizer(HandwritingRecognizer):
                 device=self._device,
                 processor_mode=type(self._processor.image_processor).__name__,
                 generation_settings=generation_settings,
+                sequence_score=candidate_scores[selected],
             )
         except RecognitionError:
             raise
@@ -170,6 +187,18 @@ class ImageHandwritingRecognizer(HandwritingRecognizer):
         restored = ((tensor * std + mean).clamp(0, 1) * 255).to(torch.uint8)
         array = restored.permute(1, 2, 0).numpy()
         Image.fromarray(array).save(sample_dir / "model_input.png")
+        channel_statistics = []
+        for index in range(tensor.shape[0]):
+            channel = tensor[index]
+            channel_statistics.append(
+                {
+                    "channel": index,
+                    "minimum": float(channel.min().item()),
+                    "maximum": float(channel.max().item()),
+                    "mean": float(channel.mean().item()),
+                    "standard_deviation": float(channel.std().item()),
+                }
+            )
         (sample_dir / "model_input.json").write_text(
             json.dumps(
                 {
@@ -178,8 +207,15 @@ class ImageHandwritingRecognizer(HandwritingRecognizer):
                     "tensor_shape": list(pixel_values.shape),
                     "tensor_min": float(pixel_values.min().item()),
                     "tensor_max": float(pixel_values.max().item()),
+                    "tensor_mean": float(pixel_values.mean().item()),
+                    "tensor_standard_deviation": float(pixel_values.std().item()),
+                    "channel_statistics": channel_statistics,
                     "processor": type(image_processor).__name__,
                     "use_fast_requested": self.processor_use_fast,
+                    "processor_size": image_processor.size,
+                    "processor_resample": str(image_processor.resample),
+                    "image_mean": image_processor.image_mean,
+                    "image_std": image_processor.image_std,
                 },
                 indent=2,
             ),

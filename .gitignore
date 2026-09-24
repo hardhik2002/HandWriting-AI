@@ -11,9 +11,14 @@ models/*
 !models/.gitkeep
 data/handwriting/*
 !data/handwriting/.gitkeep
+data/accuracy/*
+!data/accuracy/.gitkeep
 data/debug/
 reports/*
 !reports/.gitkeep
 !reports/*.md
+!reports/trajectory_comparison/
+!reports/trajectory_comparison/hardhik_comparison.json
+!reports/trajectory_comparison/hardhik_comparison.png
 logs/
 config.local.json

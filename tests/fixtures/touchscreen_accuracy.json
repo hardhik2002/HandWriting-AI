@@ -1,0 +1,50 @@
+{
+  "dataset": "current-touchscreen-verified",
+  "samples": [
+    {
+      "sample_id": "3332b0a3-8944-4d93-b914-a07b52d9a6a1",
+      "expected": "hi",
+      "level": "word",
+      "verification": "explicit physical-test label"
+    },
+    {
+      "sample_id": "0601206f-9beb-49eb-bce3-d855d3923e5d",
+      "expected": "hi",
+      "level": "word",
+      "verification": "explicit physical-test label"
+    },
+    {
+      "sample_id": "98ae9fd3-cb6c-4533-84f2-6a9fd66f5a8a",
+      "expected": "hardhik",
+      "level": "word",
+      "verification": "explicit physical-test label"
+    },
+    {
+      "sample_id": "efe0c4bc-b4f4-443f-9cf1-a65301bcfc30",
+      "expected": "how are you",
+      "level": "line",
+      "verification": "explicitly verified earlier successful physical phrase"
+    },
+    {
+      "sample_id": "00e77c8c-b06a-4c5f-9c37-1e6788d44ba5",
+      "expected": "where are you",
+      "level": "line",
+      "verification": "explicitly verified earlier successful physical phrase"
+    },
+    {
+      "sample_id": "867e9223-a4b1-4864-ac7e-0d6905d26802",
+      "expected": "hi how are you, I am hardhik",
+      "level": "line",
+      "verification": "explicit current-sentence physical-test label",
+      "segments": [
+        {"expected": "hi", "stroke_ids": [1, 2, 3]},
+        {"expected": "how", "stroke_ids": [4, 5, 6]},
+        {"expected": "are", "stroke_ids": [7, 8, 9]},
+        {"expected": "you,", "stroke_ids": [10, 11, 12, 13]},
+        {"expected": "I", "stroke_ids": [14, 15, 16]},
+        {"expected": "am", "stroke_ids": [17, 18]},
+        {"expected": "hardhik", "stroke_ids": [19, 20, 21, 22, 23, 24, 25, 26, 27]}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "dataset": "historical-verified",
+  "samples": [
+    {
+      "sample_id": "ba216970-66de-4d3e-b192-7669dd273b86",
+      "expected": "hardhik",
+      "level": "word",
+      "verification": "existing historical golden fixture"
+    }
+  ]
+}
+

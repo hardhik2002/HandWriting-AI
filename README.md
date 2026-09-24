@@ -71,7 +71,9 @@ After it is cached, recognition performs no required network call. Configure ano
 model with `TOUCHWRITE_MODEL_NAME`; no recognizer code changes are needed.
 
 Processor behavior is intentionally fixed to the checkpoint-compatible slow processor. Generation
-uses deterministic beam search; random sampling is disabled.
+uses deterministic beam search; random sampling is disabled. The recognition raster uses a measured
+6 px stroke width; the controlled historical/touchscreen comparison is in
+[`reports/live_accuracy_recovery.md`](reports/live_accuracy_recovery.md).
 
 ## Run
 
@@ -159,6 +161,14 @@ python -m touchwrite.tools.regress_whiteboard
 Replay artifacts and pixel-level comparisons are written under `reports/replay/` or
 `reports/touchscreen_replay/`; source sample directories are read-only.
 
+Run the bounded preprocessing and recognizer benchmarks, or regenerate the trajectory comparison:
+
+```powershell
+python -m touchwrite.tools.benchmark_preprocessing
+python -m touchwrite.tools.benchmark_recognizers --include-large
+python -m touchwrite.tools.compare_trajectories
+```
+
 Enable `TOUCHWRITE_DEBUG_RECOGNITION=true` to save `raw_strokes.png`, `rendered.png`,
 `processed.png`, and the exact human-viewable `model_input.png` under
 `data/debug/recognition/<word-id>/`.
@@ -181,6 +191,47 @@ labeled samples with:
 ```powershell
 python -m touchwrite.tools.export_dataset
 ```
+
+For structured personalization data, initialize a guided session, commit handwriting in TouchWrite,
+then attach each immutable sample ID to its known label. The queue covers uppercase, lowercase,
+digits, short words, common English, and project-specific technical terms. Each record retains the
+session ID, label, model outputs, raw trajectory, raw image, and processed-image paths.
+
+```powershell
+python -m touchwrite.tools.collect_dataset init --participant local-user --repeats 3
+python -m touchwrite.tools.collect_dataset add data\collection\<session-id> <sample-id> "hi"
+python -m touchwrite.tools.collect_dataset status data\collection\<session-id>
+```
+
+For the measured touchscreen accuracy benchmark, use the dedicated full-screen collector. It shows
+one authoritative target at a time and saves the raw trajectory, current render, tight crop, exact
+384×384 model input, tensor statistics, beam candidates, and preprocessing configuration. It uses
+the current recognizer unchanged and continuously refreshes `reports/touchscreen_baseline.md` and
+`reports/touchscreen_baseline.json`.
+
+```powershell
+python -m touchwrite.tools.collect_accuracy
+```
+
+The default queue contains 115 samples, including ten repetitions each of `hi`, `is`, `it`, `in`,
+`I`, `am`, and `hardhik`. If collection is interrupted, resume the session without relabeling or
+repeating completed prompts:
+
+```powershell
+python -m touchwrite.tools.collect_accuracy --resume data\accuracy\<session-id>
+```
+
+After collection, run the bounded preprocessing grid against those exact trajectories while keeping
+the historical golden set as a hard comparison:
+
+```powershell
+python -m touchwrite.tools.benchmark_preprocessing `
+  --accuracy-session data\accuracy\<session-id>
+```
+
+The generated `index.html` inside the session places raw, processed, cropped, and exact model-input
+images side by side for human legibility review. Handwriting session data remains local and ignored
+by Git.
 
 ## Evaluation
 

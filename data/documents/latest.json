@@ -1,17 +1,17 @@
 {
   "version": 1,
-  "document_id": "86d4e1da-bb94-4b5f-a2c5-f23d7b339859",
+  "document_id": "ef0306b4-10fd-4e35-b362-41f339f8e8fd",
   "current_line_index": 1,
   "lines": [
     {
       "words": [
         {
-          "commit_sequence_id": 16,
-          "text": "in hour more slow , I am headline",
-          "source_sample_id": "867e9223-a4b1-4864-ac7e-0d6905d26802",
+          "commit_sequence_id": 21,
+          "text": "hi now base you , Divya",
+          "source_sample_id": "d87e0804-81fb-4f5a-a0cb-9ccceaa1c7b7",
           "recognition_metadata": {
-            "trajectory_hash": "3812c2205e0022c8b73da13e39ea085fdb28f3bfbdab2f7c926e25d244f17c2a",
-            "inference_duration_ms": 9357.86970006302,
+            "trajectory_hash": "67f02ba107cf3127ccf35b4bbd843f7b5840b21236802ea817f0c5c0d88939f5",
+            "inference_duration_ms": 5307.3577999603,
             "cache_reused": false,
             "model_name": "microsoft/trocr-base-handwritten"
           },
@@ -1475,6 +1475,396 @@
       "state": {
         "version": 1,
         "document_id": "86d4e1da-bb94-4b5f-a2c5-f23d7b339859",
+        "current_line_index": 0,
+        "lines": [
+          {
+            "words": [],
+            "trailing_space": false
+          }
+        ]
+      }
+    },
+    {
+      "label": "newline",
+      "state": {
+        "version": 1,
+        "document_id": "86d4e1da-bb94-4b5f-a2c5-f23d7b339859",
+        "current_line_index": 1,
+        "lines": [
+          {
+            "words": [
+              {
+                "commit_sequence_id": 16,
+                "text": "in hour more slow , I am headline",
+                "source_sample_id": "867e9223-a4b1-4864-ac7e-0d6905d26802",
+                "recognition_metadata": {
+                  "trajectory_hash": "3812c2205e0022c8b73da13e39ea085fdb28f3bfbdab2f7c926e25d244f17c2a",
+                  "inference_duration_ms": 9357.86970006302,
+                  "cache_reused": false,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [],
+            "trailing_space": false
+          }
+        ]
+      }
+    },
+    {
+      "label": "commit:17",
+      "state": {
+        "version": 1,
+        "document_id": "86d4e1da-bb94-4b5f-a2c5-f23d7b339859",
+        "current_line_index": 2,
+        "lines": [
+          {
+            "words": [
+              {
+                "commit_sequence_id": 16,
+                "text": "in hour more slow , I am headline",
+                "source_sample_id": "867e9223-a4b1-4864-ac7e-0d6905d26802",
+                "recognition_metadata": {
+                  "trajectory_hash": "3812c2205e0022c8b73da13e39ea085fdb28f3bfbdab2f7c926e25d244f17c2a",
+                  "inference_duration_ms": 9357.86970006302,
+                  "cache_reused": false,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [],
+            "trailing_space": false
+          },
+          {
+            "words": [],
+            "trailing_space": false
+          }
+        ]
+      }
+    },
+    {
+      "label": "commit:18",
+      "state": {
+        "version": 1,
+        "document_id": "86d4e1da-bb94-4b5f-a2c5-f23d7b339859",
+        "current_line_index": 3,
+        "lines": [
+          {
+            "words": [
+              {
+                "commit_sequence_id": 16,
+                "text": "in hour more slow , I am headline",
+                "source_sample_id": "867e9223-a4b1-4864-ac7e-0d6905d26802",
+                "recognition_metadata": {
+                  "trajectory_hash": "3812c2205e0022c8b73da13e39ea085fdb28f3bfbdab2f7c926e25d244f17c2a",
+                  "inference_duration_ms": 9357.86970006302,
+                  "cache_reused": false,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 17,
+                "text": "Divya",
+                "source_sample_id": "3f0057c7-1390-4ee5-a219-8ed0e16f755b",
+                "recognition_metadata": {
+                  "trajectory_hash": "96b6e4dd9ee880b4d4c574866dc9f39a9693bb625ae2f50b11cf73cf91f7207d",
+                  "inference_duration_ms": 2290.1951000094414,
+                  "cache_reused": false,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [],
+            "trailing_space": false
+          }
+        ]
+      }
+    },
+    {
+      "label": "commit:19",
+      "state": {
+        "version": 1,
+        "document_id": "86d4e1da-bb94-4b5f-a2c5-f23d7b339859",
+        "current_line_index": 4,
+        "lines": [
+          {
+            "words": [
+              {
+                "commit_sequence_id": 16,
+                "text": "in hour more slow , I am headline",
+                "source_sample_id": "867e9223-a4b1-4864-ac7e-0d6905d26802",
+                "recognition_metadata": {
+                  "trajectory_hash": "3812c2205e0022c8b73da13e39ea085fdb28f3bfbdab2f7c926e25d244f17c2a",
+                  "inference_duration_ms": 9357.86970006302,
+                  "cache_reused": false,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 17,
+                "text": "Divya",
+                "source_sample_id": "3f0057c7-1390-4ee5-a219-8ed0e16f755b",
+                "recognition_metadata": {
+                  "trajectory_hash": "96b6e4dd9ee880b4d4c574866dc9f39a9693bb625ae2f50b11cf73cf91f7207d",
+                  "inference_duration_ms": 2290.1951000094414,
+                  "cache_reused": false,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 18,
+                "text": "his how are you ?",
+                "source_sample_id": "7b2358a8-2afb-4b4a-8aed-997327f8d912",
+                "recognition_metadata": {
+                  "trajectory_hash": "405087619609641aeaa671048813304f36a32edc17931dbfba0074e95a704603",
+                  "inference_duration_ms": 4548.798399977386,
+                  "cache_reused": false,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [],
+            "trailing_space": false
+          }
+        ]
+      }
+    },
+    {
+      "label": "commit:20",
+      "state": {
+        "version": 1,
+        "document_id": "86d4e1da-bb94-4b5f-a2c5-f23d7b339859",
+        "current_line_index": 5,
+        "lines": [
+          {
+            "words": [
+              {
+                "commit_sequence_id": 16,
+                "text": "in hour more slow , I am headline",
+                "source_sample_id": "867e9223-a4b1-4864-ac7e-0d6905d26802",
+                "recognition_metadata": {
+                  "trajectory_hash": "3812c2205e0022c8b73da13e39ea085fdb28f3bfbdab2f7c926e25d244f17c2a",
+                  "inference_duration_ms": 9357.86970006302,
+                  "cache_reused": false,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 17,
+                "text": "Divya",
+                "source_sample_id": "3f0057c7-1390-4ee5-a219-8ed0e16f755b",
+                "recognition_metadata": {
+                  "trajectory_hash": "96b6e4dd9ee880b4d4c574866dc9f39a9693bb625ae2f50b11cf73cf91f7207d",
+                  "inference_duration_ms": 2290.1951000094414,
+                  "cache_reused": false,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 18,
+                "text": "his how are you ?",
+                "source_sample_id": "7b2358a8-2afb-4b4a-8aed-997327f8d912",
+                "recognition_metadata": {
+                  "trajectory_hash": "405087619609641aeaa671048813304f36a32edc17931dbfba0074e95a704603",
+                  "inference_duration_ms": 4548.798399977386,
+                  "cache_reused": false,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 19,
+                "text": "32thi 1",
+                "source_sample_id": "d3089a79-a002-45f0-99b1-4c20d6bbb11a",
+                "recognition_metadata": {
+                  "trajectory_hash": "e84d5a8aa71b46c12b8b6d80a3e36dd344a9cdedf6d6661cfb2101252520cb54",
+                  "inference_duration_ms": 3781.8822000408545,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [],
+            "trailing_space": false
+          }
+        ]
+      }
+    },
+    {
+      "label": "new-document",
+      "state": {
+        "version": 1,
+        "document_id": "86d4e1da-bb94-4b5f-a2c5-f23d7b339859",
+        "current_line_index": 6,
+        "lines": [
+          {
+            "words": [
+              {
+                "commit_sequence_id": 16,
+                "text": "in hour more slow , I am headline",
+                "source_sample_id": "867e9223-a4b1-4864-ac7e-0d6905d26802",
+                "recognition_metadata": {
+                  "trajectory_hash": "3812c2205e0022c8b73da13e39ea085fdb28f3bfbdab2f7c926e25d244f17c2a",
+                  "inference_duration_ms": 9357.86970006302,
+                  "cache_reused": false,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 17,
+                "text": "Divya",
+                "source_sample_id": "3f0057c7-1390-4ee5-a219-8ed0e16f755b",
+                "recognition_metadata": {
+                  "trajectory_hash": "96b6e4dd9ee880b4d4c574866dc9f39a9693bb625ae2f50b11cf73cf91f7207d",
+                  "inference_duration_ms": 2290.1951000094414,
+                  "cache_reused": false,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 18,
+                "text": "his how are you ?",
+                "source_sample_id": "7b2358a8-2afb-4b4a-8aed-997327f8d912",
+                "recognition_metadata": {
+                  "trajectory_hash": "405087619609641aeaa671048813304f36a32edc17931dbfba0074e95a704603",
+                  "inference_duration_ms": 4548.798399977386,
+                  "cache_reused": false,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 19,
+                "text": "32thi 1",
+                "source_sample_id": "d3089a79-a002-45f0-99b1-4c20d6bbb11a",
+                "recognition_metadata": {
+                  "trajectory_hash": "e84d5a8aa71b46c12b8b6d80a3e36dd344a9cdedf6d6661cfb2101252520cb54",
+                  "inference_duration_ms": 3781.8822000408545,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [
+              {
+                "commit_sequence_id": 20,
+                "text": "exurity .",
+                "source_sample_id": "9ec9ed63-95b2-4e2b-b15d-3c09163b20a7",
+                "recognition_metadata": {
+                  "trajectory_hash": "c18109ed8f52f5f22b81acecd824e3719ed552661dd8071ff920fb492555bfd8",
+                  "inference_duration_ms": 2830.1669999491423,
+                  "cache_reused": true,
+                  "model_name": "microsoft/trocr-base-handwritten"
+                },
+                "failed": false
+              }
+            ],
+            "trailing_space": false
+          },
+          {
+            "words": [],
+            "trailing_space": false
+          }
+        ]
+      }
+    },
+    {
+      "label": "commit:21",
+      "state": {
+        "version": 1,
+        "document_id": "ef0306b4-10fd-4e35-b362-41f339f8e8fd",
         "current_line_index": 0,
         "lines": [
           {

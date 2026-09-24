@@ -1,0 +1,284 @@
+{
+  "Historical hardhik": {
+    "sample_id": "ba216970-66de-4d3e-b192-7669dd273b86",
+    "expected": "hardhik",
+    "prediction": "hardhik",
+    "trajectory": {
+      "stroke_count": 12,
+      "point_count": 354,
+      "trajectory_hash": "a6bb7b64e6809fba821cfb8376e75ceac04290f797bfc3dacfe0eef2401bb2e0",
+      "raw_bbox": {
+        "min_x": 234.66666666666666,
+        "min_y": 62.666666666666664,
+        "max_x": 698.0,
+        "max_y": 219.33333333333331,
+        "width": 463.33333333333337,
+        "height": 156.66666666666666,
+        "aspect_ratio": 2.957446808510639
+      },
+      "average_points_per_stroke": 29.5,
+      "average_point_spacing": 3.5574148475268372,
+      "median_point_spacing": 3.3333333333333086,
+      "average_velocity": 5500.318167066132,
+      "event_frequency_hz": 97.64276099695887,
+      "median_event_interval_ms": 8.3947,
+      "average_stroke_duration_ms": 291.88031666666666,
+      "total_writing_duration_ms": 9027.6923,
+      "average_inter_stroke_pause_ms": 502.2844090909091,
+      "median_inter_stroke_pause_ms": 218.8952,
+      "maximum_inter_stroke_pause_ms": 2953.3596,
+      "repeated_coordinate_steps": 12,
+      "unique_coordinate_ratio": 0.9548022598870056,
+      "long_spatial_gap_count": 10,
+      "maximum_point_spacing": 14.142135623730951,
+      "pressure_sample_ratio": 0.0,
+      "average_pressure": null,
+      "average_turning_angle_degrees": 13.91390193643224,
+      "principal_axis_degrees": 175.50628354373083,
+      "short_detached_stroke_count": 4,
+      "terminal_strokes": [
+        {
+          "stroke_id": 9,
+          "point_count": 13,
+          "path_length": 65.80306242397698,
+          "bbox": {
+            "min_x": 604.0,
+            "min_y": 96.66666666666666,
+            "max_x": 610.0,
+            "max_y": 162.0
+          },
+          "retained_by_noise_filter": true,
+          "duration_ms": 117.7777
+        },
+        {
+          "stroke_id": 10,
+          "point_count": 26,
+          "path_length": 106.27426832495834,
+          "bbox": {
+            "min_x": 611.3333333333333,
+            "min_y": 79.33333333333333,
+            "max_x": 652.6666666666666,
+            "max_y": 144.66666666666666
+          },
+          "retained_by_noise_filter": true,
+          "duration_ms": 264.0169
+        },
+        {
+          "stroke_id": 11,
+          "point_count": 14,
+          "path_length": 27.78719131809151,
+          "bbox": {
+            "min_x": 541.3333333333333,
+            "min_y": 66.0,
+            "max_x": 556.0,
+            "max_y": 76.66666666666666
+          },
+          "retained_by_noise_filter": true,
+          "duration_ms": 187.2911
+        },
+        {
+          "stroke_id": 12,
+          "point_count": 2,
+          "path_length": 0.0,
+          "bbox": {
+            "min_x": 698.0,
+            "min_y": 219.33333333333331,
+            "max_x": 698.0,
+            "max_y": 219.33333333333331
+          },
+          "retained_by_noise_filter": false,
+          "duration_ms": 211.5553
+        }
+      ],
+      "filtered_stroke_ids": [
+        12
+      ]
+    },
+    "processed": {
+      "dimensions": [
+        512,
+        128
+      ],
+      "foreground_bbox": [
+        75,
+        12,
+        438,
+        116
+      ],
+      "foreground_width": 363,
+      "foreground_height": 104,
+      "aspect_ratio": 3.4903846153846154,
+      "padding": [
+        75,
+        12,
+        74,
+        12
+      ],
+      "foreground_pixels": 7153,
+      "occupancy_percent": 10.91461181640625
+    },
+    "model_input": {
+      "dimensions": [
+        384,
+        384
+      ],
+      "foreground_bbox": [
+        56,
+        36,
+        329,
+        349
+      ],
+      "foreground_width": 273,
+      "foreground_height": 313,
+      "aspect_ratio": 0.8722044728434505,
+      "padding": [
+        56,
+        36,
+        55,
+        35
+      ],
+      "foreground_pixels": 18623,
+      "occupancy_percent": 12.629530164930555
+    }
+  },
+  "Touchscreen hardhik": {
+    "sample_id": "98ae9fd3-cb6c-4533-84f2-6a9fd66f5a8a",
+    "expected": "hardhik",
+    "prediction": "hardhijk",
+    "trajectory": {
+      "stroke_count": 9,
+      "point_count": 323,
+      "trajectory_hash": "e6067a5c9f092c45e8df8be9b30e069fe09c9b6a19ce0e8e0096ac2fbd2230a4",
+      "raw_bbox": {
+        "min_x": 68.0,
+        "min_y": 392.0,
+        "max_x": 358.0,
+        "max_y": 448.6666666666666,
+        "width": 290.0,
+        "height": 56.66666666666657,
+        "aspect_ratio": 5.117647058823538
+      },
+      "average_points_per_stroke": 35.888888888888886,
+      "average_point_spacing": 2.2124225646818907,
+      "median_point_spacing": 2.0,
+      "average_velocity": 308.8980262769606,
+      "event_frequency_hz": 94.14691055713683,
+      "median_event_interval_ms": 8.45675,
+      "average_stroke_duration_ms": 370.57922222222226,
+      "total_writing_duration_ms": 4339.3777,
+      "average_inter_stroke_pause_ms": 125.5205875,
+      "median_inter_stroke_pause_ms": 126.03015,
+      "maximum_inter_stroke_pause_ms": 207.6798,
+      "repeated_coordinate_steps": 9,
+      "unique_coordinate_ratio": 0.9690402476780186,
+      "long_spatial_gap_count": 0,
+      "maximum_point_spacing": 7.453559924999343,
+      "pressure_sample_ratio": 1.0,
+      "average_pressure": 0.48606811145510836,
+      "average_turning_angle_degrees": 21.045293193040997,
+      "principal_axis_degrees": 179.7933763009226,
+      "short_detached_stroke_count": 1,
+      "terminal_strokes": [
+        {
+          "stroke_id": 40,
+          "point_count": 16,
+          "path_length": 43.96813008773002,
+          "bbox": {
+            "min_x": 289.33333333333326,
+            "min_y": 405.3333333333333,
+            "max_x": 292.66666666666663,
+            "max_y": 448.6666666666666
+          },
+          "retained_by_noise_filter": true,
+          "duration_ms": 177.7455
+        },
+        {
+          "stroke_id": 41,
+          "point_count": 11,
+          "path_length": 8.55228474983073,
+          "bbox": {
+            "min_x": 290.0,
+            "min_y": 392.0,
+            "max_x": 292.66666666666663,
+            "max_y": 395.3333333333333
+          },
+          "retained_by_noise_filter": true,
+          "duration_ms": 238.9631
+        },
+        {
+          "stroke_id": 42,
+          "point_count": 18,
+          "path_length": 53.58702175432167,
+          "bbox": {
+            "min_x": 321.33333333333326,
+            "min_y": 402.0,
+            "max_x": 334.66666666666663,
+            "max_y": 447.3333333333333
+          },
+          "retained_by_noise_filter": true,
+          "duration_ms": 194.9338
+        },
+        {
+          "stroke_id": 43,
+          "point_count": 26,
+          "path_length": 65.79645773206319,
+          "bbox": {
+            "min_x": 336.0,
+            "min_y": 402.0,
+            "max_x": 358.0,
+            "max_y": 446.6666666666666
+          },
+          "retained_by_noise_filter": true,
+          "duration_ms": 312.3476
+        }
+      ],
+      "filtered_stroke_ids": []
+    },
+    "processed": {
+      "dimensions": [
+        512,
+        128
+      ],
+      "foreground_bbox": [
+        13,
+        13,
+        500,
+        115
+      ],
+      "foreground_width": 487,
+      "foreground_height": 102,
+      "aspect_ratio": 4.7745098039215685,
+      "padding": [
+        13,
+        13,
+        12,
+        13
+      ],
+      "foreground_pixels": 7910,
+      "occupancy_percent": 12.0697021484375
+    },
+    "model_input": {
+      "dimensions": [
+        384,
+        384
+      ],
+      "foreground_bbox": [
+        9,
+        39,
+        376,
+        345
+      ],
+      "foreground_width": 367,
+      "foreground_height": 306,
+      "aspect_ratio": 1.1993464052287581,
+      "padding": [
+        9,
+        39,
+        8,
+        39
+      ],
+      "foreground_pixels": 20681,
+      "occupancy_percent": 14.025200737847221
+    }
+  }
+}

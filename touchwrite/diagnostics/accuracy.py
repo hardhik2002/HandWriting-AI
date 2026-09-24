@@ -87,13 +87,55 @@ def trajectory_metrics(word: HandwrittenWord) -> dict[str, Any]:
     bounds = bounding_box(word.strokes)
     distances: list[float] = []
     velocities: list[float] = []
+    point_intervals_ms: list[float] = []
+    turning_angles: list[float] = []
+    repeated_coordinates = 0
+    stroke_durations_ms: list[float] = []
     for stroke in word.strokes:
+        vectors: list[tuple[float, float]] = []
         for previous, current in zip(stroke.points, stroke.points[1:], strict=False):
             distance = math.hypot(current.x_raw - previous.x_raw, current.y_raw - previous.y_raw)
             distances.append(distance)
             elapsed = (current.timestamp_ns - previous.timestamp_ns) / 1_000_000_000
             if elapsed > 0:
                 velocities.append(distance / elapsed)
+                point_intervals_ms.append(elapsed * 1000)
+            if distance == 0:
+                repeated_coordinates += 1
+            elif distance > 0:
+                vectors.append((current.x_raw - previous.x_raw, current.y_raw - previous.y_raw))
+        for previous, current in zip(vectors, vectors[1:], strict=False):
+            dot = previous[0] * current[0] + previous[1] * current[1]
+            denominator = math.hypot(*previous) * math.hypot(*current)
+            if denominator > 0:
+                turning_angles.append(
+                    math.degrees(math.acos(max(-1.0, min(1.0, dot / denominator))))
+                )
+        if len(stroke.points) > 1:
+            stroke_durations_ms.append(
+                (stroke.points[-1].timestamp_ns - stroke.points[0].timestamp_ns) / 1_000_000
+            )
+    inter_stroke_pauses_ms = [
+        max(0.0, (current.points[0].timestamp_ns - previous.points[-1].timestamp_ns) / 1_000_000)
+        for previous, current in zip(word.strokes, word.strokes[1:], strict=False)
+        if previous.points and current.points
+    ]
+    total_duration_ms = 0.0
+    if points:
+        total_duration_ms = (max(point.timestamp_ns for point in points) - min(
+            point.timestamp_ns for point in points
+        )) / 1_000_000
+    median_spacing = float(np.median(distances)) if distances else 0.0
+    long_gap_threshold = max(8.0, median_spacing * 3.0)
+    coordinate_pairs = {(point.x_raw, point.y_raw) for point in points}
+    pressures = [point.pressure for point in points if point.pressure is not None]
+    principal_axis_degrees = None
+    if len(points) > 1:
+        coordinates = np.asarray([(point.x_raw, point.y_raw) for point in points])
+        covariance = np.cov(coordinates, rowvar=False)
+        eigenvalues, eigenvectors = np.linalg.eigh(covariance)
+        axis = eigenvectors[:, int(np.argmax(eigenvalues))]
+        principal_axis_degrees = float(math.degrees(math.atan2(axis[1], axis[0])))
     retained_ids = {
         stroke.stroke_id for stroke in filter_isolated_point_strokes(word.strokes)
     }
@@ -128,8 +170,40 @@ def trajectory_metrics(word: HandwrittenWord) -> dict[str, Any]:
         "raw_bbox": raw_bbox,
         "average_points_per_stroke": len(points) / max(1, len(word.strokes)),
         "average_point_spacing": float(np.mean(distances)) if distances else 0.0,
-        "median_point_spacing": float(np.median(distances)) if distances else 0.0,
+        "median_point_spacing": median_spacing,
         "average_velocity": float(np.mean(velocities)) if velocities else 0.0,
+        "event_frequency_hz": (
+            1000.0 / float(np.mean(point_intervals_ms)) if point_intervals_ms else 0.0
+        ),
+        "median_event_interval_ms": (
+            float(np.median(point_intervals_ms)) if point_intervals_ms else 0.0
+        ),
+        "average_stroke_duration_ms": (
+            float(np.mean(stroke_durations_ms)) if stroke_durations_ms else 0.0
+        ),
+        "total_writing_duration_ms": total_duration_ms,
+        "average_inter_stroke_pause_ms": (
+            float(np.mean(inter_stroke_pauses_ms)) if inter_stroke_pauses_ms else 0.0
+        ),
+        "median_inter_stroke_pause_ms": (
+            float(np.median(inter_stroke_pauses_ms)) if inter_stroke_pauses_ms else 0.0
+        ),
+        "maximum_inter_stroke_pause_ms": max(inter_stroke_pauses_ms, default=0.0),
+        "repeated_coordinate_steps": repeated_coordinates,
+        "unique_coordinate_ratio": len(coordinate_pairs) / max(1, len(points)),
+        "long_spatial_gap_count": sum(distance > long_gap_threshold for distance in distances),
+        "maximum_point_spacing": max(distances, default=0.0),
+        "pressure_sample_ratio": len(pressures) / max(1, len(points)),
+        "average_pressure": float(np.mean(pressures)) if pressures else None,
+        "average_turning_angle_degrees": (
+            float(np.mean(turning_angles)) if turning_angles else 0.0
+        ),
+        "principal_axis_degrees": principal_axis_degrees,
+        "short_detached_stroke_count": sum(
+            stroke_path_length(stroke)
+            < max(2.0, ((bounds.max_y - bounds.min_y) if bounds is not None else 1.0) * 0.25)
+            for stroke in word.strokes
+        ),
         "terminal_strokes": terminal,
         "filtered_stroke_ids": sorted(
             stroke.stroke_id for stroke in word.strokes if stroke.stroke_id not in retained_ids
@@ -179,6 +253,7 @@ def _result_payload(result: RecognitionResult) -> dict[str, Any]:
         "processing_duration_ms": result.processing_duration_ms,
         "generation_duration_ms": result.generation_duration_ms,
         "decoding_duration_ms": result.decoding_duration_ms,
+        "sequence_score": result.sequence_score,
     }
 
 

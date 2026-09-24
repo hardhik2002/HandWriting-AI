@@ -195,7 +195,7 @@ class MainWindow(QMainWindow):
         self._update_mode_label()
         if self._active_input_mode == "touchpad":
             self._start_writing_mode()
-        QTimer.singleShot(0, lambda: self._update_toolbar_responsiveness(self.width()))
+        self._update_toolbar_responsiveness(self.width())
 
     def _build_toolbars(self) -> None:
         identity = QToolBar("Identity")
